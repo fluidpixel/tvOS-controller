@@ -130,16 +130,11 @@ public class TVCPhoneSession : NSObject, NSNetServiceBrowserDelegate, NSNetServi
         self.arrDevices.remove(service)
     }
     public func netServiceBrowser(browser: NSNetServiceBrowser, didFindService service: NSNetService, moreComing: Bool) {
-        self.arrDevices.insert(service)
-        service.delegate = self
-        service.resolveWithTimeout(30.0)
-        
-//        for timer in (1...5).map( { dispatch_time(DISPATCH_TIME_NOW, Int64($0 * NSEC_PER_SEC)) } ) {
-//            dispatch_after(timer, dispatch_get_main_queue()) {
-//                self.selectedSocket?.sendMessageObject(Message(type: .TEST))
-//            }
-//        }
-        
+        if service.name == NET_SERVICE_NAME {
+            self.arrDevices.insert(service)
+            service.delegate = self
+            service.resolveWithTimeout(30.0)
+        }
     }
     
     

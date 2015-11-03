@@ -128,7 +128,7 @@ public class TVCTVSession : NSObject, NSNetServiceDelegate, GCDAsyncSocketDelega
         self.socket = GCDAsyncSocket(delegate: self, delegateQueue: delegateQueue)
         
         try! self.socket.acceptOnPort(0)
-        self.service = NSNetService(domain: "local.", type: SERVICE_NAME, name: "", port: Int32(self.socket.localPort()))
+        self.service = NSNetService(domain: "local.", type: SERVICE_NAME, name: NET_SERVICE_NAME, port: Int32(self.socket.localPort()))
         self.service.delegate = self
         self.service.publish()
 
