@@ -22,6 +22,9 @@
 		27BFD3181BE7868C00AB28D5 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BFD3171BE7868C00AB28D5 /* ViewController.swift */; };
 		27BFD31B1BE7868C00AB28D5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 27BFD3191BE7868C00AB28D5 /* Main.storyboard */; };
 		27BFD31D1BE7868C00AB28D5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 27BFD31C1BE7868C00AB28D5 /* Assets.xcassets */; };
+		B92C0B0E1BE8D85800FF16C9 /* SceneKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B92C0B0D1BE8D85800FF16C9 /* SceneKit.framework */; };
+		B92C0B101BE8E05000FF16C9 /* SceneKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B92C0B0F1BE8E05000FF16C9 /* SceneKit.framework */; };
+		B92C0B121BE8E5B500FF16C9 /* SphereScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = B92C0B111BE8E5B500FF16C9 /* SphereScene.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,6 +48,9 @@
 		27BFD31A1BE7868C00AB28D5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		27BFD31C1BE7868C00AB28D5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		27BFD31E1BE7868C00AB28D5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B92C0B0D1BE8D85800FF16C9 /* SceneKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SceneKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.1.sdk/System/Library/Frameworks/SceneKit.framework; sourceTree = DEVELOPER_DIR; };
+		B92C0B0F1BE8E05000FF16C9 /* SceneKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SceneKit.framework; path = System/Library/Frameworks/SceneKit.framework; sourceTree = SDKROOT; };
+		B92C0B111BE8E5B500FF16C9 /* SphereScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SphereScene.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,6 +58,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B92C0B0E1BE8D85800FF16C9 /* SceneKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -59,6 +66,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B92C0B101BE8E05000FF16C9 /* SceneKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -103,6 +111,8 @@
 		27BFD3091BE7868C00AB28D5 = {
 			isa = PBXGroup;
 			children = (
+				B92C0B0F1BE8E05000FF16C9 /* SceneKit.framework */,
+				B92C0B0D1BE8D85800FF16C9 /* SceneKit.framework */,
 				2703A0861BE7870000397389 /* Connectivity */,
 				27BFD3141BE7868C00AB28D5 /* tvOS-controller */,
 				2703A0751BE786F000397389 /* iPhone-controller */,
@@ -127,6 +137,7 @@
 				27BFD3191BE7868C00AB28D5 /* Main.storyboard */,
 				27BFD31C1BE7868C00AB28D5 /* Assets.xcassets */,
 				27BFD31E1BE7868C00AB28D5 /* Info.plist */,
+				B92C0B111BE8E5B500FF16C9 /* SphereScene.swift */,
 			);
 			path = "tvOS-controller";
 			sourceTree = "<group>";
@@ -180,6 +191,7 @@
 				TargetAttributes = {
 					2703A0731BE786F000397389 = {
 						CreatedOnToolsVersion = 7.1;
+						DevelopmentTeam = LCP5AMLC52;
 					};
 					27BFD3111BE7868C00AB28D5 = {
 						CreatedOnToolsVersion = 7.1;
@@ -247,6 +259,7 @@
 				2703A0951BE7876A00397389 /* TVCTVSession.swift in Sources */,
 				2703A08F1BE7876A00397389 /* GCDAsyncSocket.m in Sources */,
 				27BFD3181BE7868C00AB28D5 /* ViewController.swift in Sources */,
+				B92C0B121BE8E5B500FF16C9 /* SphereScene.swift in Sources */,
 				2703A0911BE7876A00397389 /* SharedKeys.swift in Sources */,
 				27BFD3161BE7868C00AB28D5 /* AppDelegate.swift in Sources */,
 			);
@@ -287,12 +300,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = "iPhone-controller/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.fpstudios.iPhone-controller";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "iPhone-controller-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -305,12 +320,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = "iPhone-controller/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.fpstudios.iPhone-controller";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "iPhone-controller-Bridging-Header.h";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -437,6 +454,7 @@
 				2703A0841BE786F000397389 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		27BFD30D1BE7868C00AB28D5 /* Build configuration list for PBXProject "tvOS-controller" */ = {
 			isa = XCConfigurationList;

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder.AppleTV.Storyboard" version="3.0" toolsVersion="9059" systemVersion="15B42" targetRuntime="AppleTV" propertyAccessControl="none" useAutolayout="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder.AppleTV.Storyboard" version="3.0" toolsVersion="9059" systemVersion="14F1021" targetRuntime="AppleTV" propertyAccessControl="none" useAutolayout="YES" initialViewController="BYZ-38-t0r">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9049"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
         <!--View Controller-->
@@ -16,8 +17,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="1920" height="1080"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jwj-0G-o3A">
-                                <rect key="frame" x="450" y="20" width="235" height="86"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jwj-0G-o3A">
+                                <rect key="frame" x="20" y="8" width="227" height="86"/>
                                 <animations/>
                                 <inset key="contentEdgeInsets" minX="40" minY="20" maxX="40" maxY="20"/>
                                 <state key="normal" title="Button 1"/>
@@ -25,8 +26,8 @@
                                     <action selector="button1Pressed" destination="BYZ-38-t0r" eventType="primaryActionTriggered" id="QjQ-Gu-9de"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vF3-ey-BbJ">
-                                <rect key="frame" x="450" y="130" width="235" height="86"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vF3-ey-BbJ">
+                                <rect key="frame" x="20" y="118" width="227" height="86"/>
                                 <animations/>
                                 <inset key="contentEdgeInsets" minX="40" minY="20" maxX="40" maxY="20"/>
                                 <state key="normal" title="Button 2"/>
@@ -34,8 +35,8 @@
                                     <action selector="button2Pressed" destination="BYZ-38-t0r" eventType="primaryActionTriggered" id="4wT-oF-Cvp"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yA2-kN-hOI">
-                                <rect key="frame" x="450" y="249" width="235" height="86"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yA2-kN-hOI">
+                                <rect key="frame" x="20" y="228" width="227" height="86"/>
                                 <animations/>
                                 <inset key="contentEdgeInsets" minX="40" minY="20" maxX="40" maxY="20"/>
                                 <state key="normal" title="Button 3"/>
@@ -43,28 +44,59 @@
                                     <action selector="button3Pressed" destination="BYZ-38-t0r" eventType="primaryActionTriggered" id="lD4-YW-ikX"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="TopLeft" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nxF-Yg-3fd">
-                                <rect key="frame" x="706" y="20" width="735" height="642"/>
-                                <animations/>
-                                <color key="backgroundColor" red="1" green="0.80580594490000002" blue="0.02590013587" alpha="1" colorSpace="deviceRGB"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
+                            <sceneKitView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gKl-O5-OLx">
+                                <rect key="frame" x="934" y="0.0" width="966" height="1072"/>
+                            </sceneKitView>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" userInteractionEnabled="NO" contentMode="scaleToFill" editable="NO" textAlignment="natural" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="08w-yO-VGn">
+                                <rect key="frame" x="307" y="8" width="619" height="1064"/>
+                                <color key="backgroundColor" red="1" green="0.85397261250000001" blue="0.21672609800000001" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="619" id="7Bi-gx-8Nf"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <imageView hidden="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jm9-sF-FGW">
+                                <rect key="frame" x="307" y="8" width="619" height="1064"/>
+                            </imageView>
                         </subviews>
                         <animations/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="08w-yO-VGn" firstAttribute="top" secondItem="jwj-0G-o3A" secondAttribute="top" id="3Xt-RB-L0E"/>
+                            <constraint firstAttribute="leadingMargin" secondItem="yA2-kN-hOI" secondAttribute="leading" id="7gx-Ch-m3K"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="gKl-O5-OLx" secondAttribute="bottom" constant="8" symbolic="YES" id="Bao-2l-95c"/>
+                            <constraint firstItem="08w-yO-VGn" firstAttribute="leading" secondItem="jwj-0G-o3A" secondAttribute="trailing" constant="60" symbolic="YES" id="Gyx-6a-WWi"/>
+                            <constraint firstItem="vF3-ey-BbJ" firstAttribute="top" secondItem="jwj-0G-o3A" secondAttribute="bottom" constant="24" symbolic="YES" id="Lbe-lZ-OAu"/>
+                            <constraint firstItem="yA2-kN-hOI" firstAttribute="top" secondItem="vF3-ey-BbJ" secondAttribute="bottom" constant="24" symbolic="YES" id="QRG-5w-XVe"/>
+                            <constraint firstItem="vF3-ey-BbJ" firstAttribute="height" secondItem="yA2-kN-hOI" secondAttribute="height" id="R4q-ba-rmS"/>
+                            <constraint firstItem="jwj-0G-o3A" firstAttribute="height" secondItem="vF3-ey-BbJ" secondAttribute="height" id="Re4-PD-gwP"/>
+                            <constraint firstAttribute="leadingMargin" secondItem="jwj-0G-o3A" secondAttribute="leading" id="TsN-TJ-Nld"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="gKl-O5-OLx" secondAttribute="trailing" id="VoV-Ma-EVT"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="08w-yO-VGn" secondAttribute="bottom" constant="8" symbolic="YES" id="Y56-is-Aqy"/>
+                            <constraint firstItem="jwj-0G-o3A" firstAttribute="width" secondItem="vF3-ey-BbJ" secondAttribute="width" id="fWQ-en-kw1"/>
+                            <constraint firstAttribute="leadingMargin" secondItem="vF3-ey-BbJ" secondAttribute="leading" id="g5n-bV-U6a"/>
+                            <constraint firstItem="08w-yO-VGn" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="8" symbolic="YES" id="jKx-dx-sm7"/>
+                            <constraint firstItem="gKl-O5-OLx" firstAttribute="leading" secondItem="08w-yO-VGn" secondAttribute="trailing" constant="8" symbolic="YES" id="kmU-uO-0Uh"/>
+                            <constraint firstItem="gKl-O5-OLx" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="nFD-C2-4Yw"/>
+                            <constraint firstItem="vF3-ey-BbJ" firstAttribute="width" secondItem="yA2-kN-hOI" secondAttribute="width" id="wBx-kg-VD9"/>
+                            <constraint firstItem="08w-yO-VGn" firstAttribute="leading" secondItem="yA2-kN-hOI" secondAttribute="trailing" constant="60" symbolic="YES" id="ymD-LN-yJX"/>
+                            <constraint firstItem="08w-yO-VGn" firstAttribute="leading" secondItem="vF3-ey-BbJ" secondAttribute="trailing" constant="60" symbolic="YES" id="yrl-7c-Xub"/>
+                        </constraints>
                     </view>
                     <connections>
+                        <outlet property="DrawCanvas" destination="jm9-sF-FGW" id="RbZ-XN-UYr"/>
+                        <outlet property="accelView" destination="gKl-O5-OLx" id="mBb-fA-bUO"/>
                         <outlet property="button1" destination="jwj-0G-o3A" id="8xN-bh-9mx"/>
                         <outlet property="button2" destination="vF3-ey-BbJ" id="aiR-PA-GoX"/>
                         <outlet property="button3" destination="yA2-kN-hOI" id="dP0-JA-OPe"/>
-                        <outlet property="messageArea" destination="nxF-Yg-3fd" id="cwj-Js-zyn"/>
+                        <outlet property="drawCanvas" destination="jm9-sF-FGW" id="FPv-Ye-oYS"/>
+                        <outlet property="messageView" destination="08w-yO-VGn" id="3tK-jG-jCy"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="326" y="423"/>
+            <point key="canvasLocation" x="-50" y="-901"/>
         </scene>
     </scenes>
 </document>
