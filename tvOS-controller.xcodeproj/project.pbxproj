@@ -24,7 +24,6 @@
 		27BFD31D1BE7868C00AB28D5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 27BFD31C1BE7868C00AB28D5 /* Assets.xcassets */; };
 		B92C0B0E1BE8D85800FF16C9 /* SceneKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B92C0B0D1BE8D85800FF16C9 /* SceneKit.framework */; };
 		B92C0B101BE8E05000FF16C9 /* SceneKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B92C0B0F1BE8E05000FF16C9 /* SceneKit.framework */; };
-		B92C0B121BE8E5B500FF16C9 /* SphereScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = B92C0B111BE8E5B500FF16C9 /* SphereScene.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,7 +49,6 @@
 		27BFD31E1BE7868C00AB28D5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B92C0B0D1BE8D85800FF16C9 /* SceneKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SceneKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.1.sdk/System/Library/Frameworks/SceneKit.framework; sourceTree = DEVELOPER_DIR; };
 		B92C0B0F1BE8E05000FF16C9 /* SceneKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SceneKit.framework; path = System/Library/Frameworks/SceneKit.framework; sourceTree = SDKROOT; };
-		B92C0B111BE8E5B500FF16C9 /* SphereScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SphereScene.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -137,7 +135,6 @@
 				27BFD3191BE7868C00AB28D5 /* Main.storyboard */,
 				27BFD31C1BE7868C00AB28D5 /* Assets.xcassets */,
 				27BFD31E1BE7868C00AB28D5 /* Info.plist */,
-				B92C0B111BE8E5B500FF16C9 /* SphereScene.swift */,
 			);
 			path = "tvOS-controller";
 			sourceTree = "<group>";
@@ -259,7 +256,6 @@
 				2703A0951BE7876A00397389 /* TVCTVSession.swift in Sources */,
 				2703A08F1BE7876A00397389 /* GCDAsyncSocket.m in Sources */,
 				27BFD3181BE7868C00AB28D5 /* ViewController.swift in Sources */,
-				B92C0B121BE8E5B500FF16C9 /* SphereScene.swift in Sources */,
 				2703A0911BE7876A00397389 /* SharedKeys.swift in Sources */,
 				27BFD3161BE7868C00AB28D5 /* AppDelegate.swift in Sources */,
 			);
