@@ -16,9 +16,14 @@ class ViewController: UIViewController, TVCPhoneSessionDelegate {
     let motion = CMMotionManager()
     
     var buttonEnabled = 0
+    var speedSquared : Float = 0.0
 
+    @IBOutlet weak var speed: UILabel!
     @IBOutlet var TouchPad: UIPanGestureRecognizer!
     @IBOutlet var messageArea:UILabel!
+    
+    @IBOutlet weak var AccelerateButton: UIButton!
+    @IBOutlet weak var BreakButton: UIButton!
     
     //for touchpad-to canvas on tv
     var point = CGPoint.zero
@@ -40,7 +45,7 @@ class ViewController: UIViewController, TVCPhoneSessionDelegate {
                     
                     let temp = data!.attitude
                     
-                    let accel : [Float] = [Float(temp.quaternion.x), Float(temp.quaternion.x), Float(temp.quaternion.x), Float(temp.quaternion.w)]
+                    let accel : [Float] = [Float(temp.pitch), Float(temp.yaw), Float(temp.roll)]
                     self.send("Accelerometer", text: accel)
                 }else {
                     self.write((error?.localizedDescription)!)
@@ -62,9 +67,36 @@ class ViewController: UIViewController, TVCPhoneSessionDelegate {
         motion.stopDeviceMotionUpdates()
 
     }
+    //Button tap controls
+    @IBAction func OnAccelerateTapped(sender: UIButton) {
+        //Note: Touch inside disables the time the same way touch outside does,
+        //      so the user can hold the button to gain acceleration
+        // 1  - accelerate
+        // 0  - release
+        // -1 - break
+        send("Speed", text: 0)
+    }
     
-    @IBAction func OnPan(sender: UIPanGestureRecognizer) {
+    @IBAction func OnAccelerateReleased(sender: UIButton) {
+        send("Speed", text: 0)
         
+    }
+    
+    @IBAction func AcceleratePressed(sender: UIButton) {
+        send("Speed", text: 1)
+    }
+    
+
+    @IBAction func OnBreakTapped(sender: UIButton) {
+        send("Speed", text: 0)
+    }
+    
+    @IBAction func BreakPressed(sender: UIButton) {
+        send("Speed", text: -1)
+    }
+    
+    @IBAction func OnBreakReleased(sender: UIButton) {
+        send("Speed", text: 0)
     }
     
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
@@ -106,7 +138,15 @@ class ViewController: UIViewController, TVCPhoneSessionDelegate {
         super.viewDidLoad()
         self.remote.delegate = self
         self.view?.multipleTouchEnabled = true
+        
         // Do any additional setup after loading the view, typically from a nib.
+    }
+    
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        let value = UIInterfaceOrientation.LandscapeLeft.rawValue
+        UIDevice.currentDevice().setValue(value, forKey: "orientation")
     }
 
     override func didReceiveMemoryWarning() {
@@ -119,6 +159,12 @@ class ViewController: UIViewController, TVCPhoneSessionDelegate {
         self.write("\(text)")
         self.remote.sendMessage([identifier:text], replyHandler: { (reply) -> Void in
             self.write("Reply received: \(reply)")
+            
+            if var tempSpeed = reply["Reply"] as? Float {
+                tempSpeed = sqrt(tempSpeed)
+                self.speed.text = "\(tempSpeed)mph"
+            }
+            
             }) { (error) -> Void in
                  self.write("ERROR : \(error)")
         }

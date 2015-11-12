@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import SceneKit
 
-class ViewController: UIViewController, TVCTVSessionDelegate {
+class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDelegate  {
     
     @IBOutlet var messageArea: UILabel!
     
@@ -25,22 +25,48 @@ class ViewController: UIViewController, TVCTVSessionDelegate {
     let remote = TVCTVSession()
     
     @IBOutlet weak var DrawCanvas : UIImageView!
-    //rotation
-    var accelData : [Float] = [0.0, 0.0, 0.0, 0.0]
-    var planeNode = SCNNode()
-    var sphereNode = SCNNode()
-    var startorientation = SCNVector4()
+    
+    var gameObjects = [GameObject]()
+    var timer = NSTimer()
+
+    var vectorToMoveBy = SCNVector3(0, 0, 1)
+    var firstRun = true
+    var initialTime = 0.0
+    //testing
+    let angle = sin(M_PI_4 / 2.0)
+    
+    //scene nodes
+    let cameraNode = SCNNode()
+    let lightNode = SCNNode()
+    var groundNode = SCNNode()
+    var carNode = SCNNode()
+    //boxes
+    var boxNode = SCNNode()
+    var boxNode2 = SCNNode()
+    
+    //update variables
+    var accel : Float = 0.0
+    var speed : Float = 0.0
+    var previousOrientation = SCNQuaternion()
+    var glkRepresentation = GLKQuaternion()
+    var slerp = 0.0
+    var isSlerping = false
+    
+    //y, p, r variables
+    var intialYPR : [Float] = [0.0,0.0,0.0]
+    var currentYPR : [Float] = [0.0,0.0,0.0]
     
     // draw
     var lastPoint = CGPoint.zero
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.remote.delegate = self
-       
-        // Do any additional setup after loading the view, typically from a nib.
         
+        self.remote.delegate = self
+        accelView.delegate = self
+        // Do any additional setup after loading the view, typically from a nib.
         prepareScene()
+        accelView.play(nil)
     }
 
     override func didReceiveMemoryWarning() {
@@ -48,88 +74,174 @@ class ViewController: UIViewController, TVCTVSessionDelegate {
         // Dispose of any resources that can be recreated.
     }
     
+    func renderer(renderer: SCNSceneRenderer, updateAtTime time: NSTimeInterval) {
+        
+        //called first, any pre-render game logic here
+    }
+    
+    func renderer(renderer: SCNSceneRenderer, didSimulatePhysicsAtTime time: NSTimeInterval) {
+        
+        //physics updates here
+        
+        //print(time)
+        if firstRun {
+            //time zero
+            updateCar(0.0)
+            initialTime = time
+            firstRun = false
+        } else {
+            updateCar((time - initialTime))
+            initialTime = time
+        }
+    }
+    
+    func updateCar(delta: NSTimeInterval) {
+        
+        //move car in the direction it is currently facing
+
+        carNode.runAction(SCNAction.moveByX(CGFloat(vectorToMoveBy.x * Float(delta) * (accel)), y: 0.0, z: CGFloat(vectorToMoveBy.z * Float(delta) * (accel)), duration: delta))
+        speed = vectorToMoveBy.magnitudeSquared()
+        cameraNode.position = SCNVector3(carNode.position.x + 10, carNode.position.y + 10, carNode.position.z)
+//        if isSlerping {
+//            slerp += delta
+//            
+//            var slerpAmount = slerp / 1.0
+//            
+//            if slerpAmount > 1.0 {
+//                slerpAmount = 1.0
+//                isSlerping = false
+//            }
+//            
+           // let tempGLK = GLKQuaternionMake(carNode.orientation.x, carNode.orientation.y, carNode.orientation.z, carNode.orientation.w)
+            
+           // let result = GLKQuaternionSlerp(tempGLK, glkRepresentation, Float(slerpAmount))
+            
+            //carNode.orientation.y = result.y
+            
+            //let angle = tempGLK.AngleFromQuaternion(result)
+        
+            let angle = (currentYPR[0]) //pitch
+            
+            carNode.runAction((SCNAction.rotateByAngle(CGFloat(angle * Float(delta)), aroundAxis: SCNVector3(0, 1, 0), duration: delta)), completionHandler: { () -> Void in
+                self.intialYPR = self.currentYPR
+            })
+            
+            let matrix = SCNMatrix4MakeRotation((angle  * Float(delta)), 0, 1, 0)
+            
+            vectorToMoveBy = vectorToMoveBy.multiplyByMatrix4(matrix)
+        
+           // intialYPR = [carNode.eulerAngles.x, carNode.eulerAngles.y, carNode.eulerAngles.z]
+
+            //let temp = GLKQuaternionRotateVector3(result, GLKVector3(v: (vectorToMoveBy.x, vectorToMoveBy.y, vectorToMoveBy.z)))
+            //vectorToMoveBy = SCNVector3(temp.x, temp.y, temp.z)
+            
+       // }
+    }
+    
     func prepareScene(){
         
-        let scene = SCNScene()
-        accelView.scene = scene
-        
+        accelView.scene = SCNScene()
+        //accelView.scene!.physicsWorld.gravity = SCNVector3(x: 0.0, y: 0.0, z: 0.0)
+        //camera
         let camera = SCNCamera()
-        let cameraNode = SCNNode()
         cameraNode.camera = camera
-        cameraNode.position = SCNVector3(x : -3.0, y: 3.0, z: 25.0)
+        cameraNode.position = SCNVector3(-10.0, 5.0, 10.0)
         
-        let ambient = SCNLight()
-        ambient.type = SCNLightTypeAmbient
-        ambient.color = UIColor(red: 0.5, green: 0.5, blue: 0.2, alpha: 1.0)
-        cameraNode.light = ambient
+        let ambientLight = SCNLight()
+        ambientLight.type = SCNLightTypeAmbient
+        ambientLight.color = UIColor(red: 0.5, green: 0.5, blue: 0.0, alpha: 1.0)
+        cameraNode.light = ambientLight
+        
+        //light
         
         let light = SCNLight()
-        light.type = SCNLightTypeSpot
-        light.spotInnerAngle = 30.0
-        light.spotOuterAngle = 80.0
+        light.type = SCNLightTypeDirectional
         light.castsShadow = true
-        let lightNode = SCNNode()
+        
         lightNode.light = light
         lightNode.position = SCNVector3(x: 1.5, y: 1.5, z: 1.5)
         
-        let sphere = SCNSphere(radius: 1.0)
-        let sphereMaterial = SCNMaterial()
-        sphereMaterial.diffuse.contents = UIColor.yellowColor()
-        sphere.materials = [sphereMaterial]
-        sphereNode = SCNNode(geometry: sphere)
+        //object
+        let carScene : SCNScene = SCNScene(named: "gameAssets.scnassets/AudiCoupe.dae")!
         
-        let plane = SCNPlane(width: 20.0, height: 20.0)
-        let planeMaterial = SCNMaterial()
-        planeMaterial.diffuse.contents = UIColor.blueColor()
-        plane.materials = [planeMaterial]
-        planeNode = SCNNode(geometry: plane)
-        planeNode.eulerAngles = SCNVector3(x: GLKMathDegreesToRadians(-90), y: 0, z: 0)
-        planeNode.position = SCNVector3(x: 0, y: -0.5, z: 0)
-        startorientation = planeNode.orientation
+        if let tempNode = carScene.rootNode.childNodeWithName("Car", recursively: true){
+            carNode = tempNode
+            carNode.position = SCNVector3(x: 0.0, y: 0.0, z: 0.0)
+            if carNode.geometry == nil {
+                carNode.geometry = SCNBox(width: 1.0, height: 1.0, length: 2.0, chamferRadius: 0.0)
+            }
+            let physicsShape = SCNPhysicsShape(geometry: carNode.geometry!, options: nil)
+            let physicsBody = SCNPhysicsBody(type: .Dynamic, shape: physicsShape)
+            carNode.physicsBody = physicsBody
+            
+            accelView.scene!.rootNode.addChildNode(carNode)
+            
+            //let axisNode = SCNNode()
+        }else {
+            print("Could not load car")
+        }
         
-        //physics
-        let planeShape = SCNPhysicsShape(geometry: plane, options: nil)
-        let planeBody = SCNPhysicsBody(type: .Kinematic, shape: planeShape)
-        planeNode.physicsBody = planeBody
-        //planeNode.pivot = SCNMatrix4MakeTranslation(25.0, 0.0, 25.0)
+        //add some placed boxes
+        let box = SCNBox(width: 1.0, height: 1.0, length: 1.0, chamferRadius: 0.0)
+        let boxMaterial = SCNMaterial()
+        boxMaterial.diffuse.contents = UIColor.redColor()
+        box.materials = [boxMaterial]
+        boxNode.position = SCNVector3(x: 5.0, y: 0.0, z: 5.0)
+        let physicsBox = SCNPhysicsShape(geometry: box, options: nil)
+        let boxBody = SCNPhysicsBody(type: .Static, shape: physicsBox)
+        boxNode = SCNNode(geometry: box)
+        boxNode.physicsBody = boxBody
+        boxNode2 = boxNode
+        boxNode2.position = SCNVector3(x: 1.0, y: 0.0, z: 1.0)
         
-        let gravity = SCNPhysicsField.radialGravityField()
-        gravity.strength = 0
-        sphereNode.physicsField = gravity
+        accelView.scene!.rootNode.addChildNode(boxNode)
+        accelView.scene!.rootNode.addChildNode(boxNode2)
         
-        let sphereShape = SCNPhysicsShape(geometry: sphere, options: nil)
-        let sphereBody = SCNPhysicsBody(type: .Static, shape: sphereShape)
-        sphereNode.physicsBody = sphereBody
+        //ground
+        let ground = SCNFloor()
+        ground.reflectivity = 0
+        let groundMaterial = SCNMaterial()
+        groundMaterial.diffuse.contents = UIColor.blueColor()
+        let physicsShape = SCNPhysicsShape(geometry: SCNFloor(), options: nil)
+        let body = SCNPhysicsBody(type: .Static, shape: physicsShape)
+        ground.materials = [groundMaterial]
+        groundNode = SCNNode(geometry: ground)
+        groundNode.physicsBody = body
         
-        let constraint = SCNLookAtConstraint(target: planeNode)
-        constraint.gimbalLockEnabled = true
+        groundNode.position = SCNVector3(x: 0, y: -0.5, z: 0)
+        previousOrientation = groundNode.orientation
+        
+        //constraints
+        let constraint = SCNLookAtConstraint(target: carNode)
+        
         cameraNode.constraints = [constraint]
         lightNode.constraints = [constraint]
         
-        scene.rootNode.addChildNode(lightNode)
-        scene.rootNode.addChildNode(cameraNode)
-        scene.rootNode.addChildNode(sphereNode)
-        scene.rootNode.addChildNode(planeNode)
+        accelView.scene!.rootNode.addChildNode(cameraNode)
+        accelView.scene!.rootNode.addChildNode(lightNode)
 
+        accelView.scene!.rootNode.addChildNode(groundNode)
+        
+        
     }
     
-    func rotatePlane(values : [Float]?) {
-        if values != nil {
-            
-            let orientation = startorientation
-            let quat = GLKQuaternionMultiply(GLKQuaternionMake(orientation.x, orientation.y, orientation.z, orientation.w), GLKQuaternionMake(values![0], values![1], values![2], values![3]))
-            
-            planeNode.orientation = SCNVector4Make(quat.x , quat.y, quat.z, quat.w)
-            //planeNode.runAction(SCNAction.rotateToX(CGFloat(values![0]), y: CGFloat(values![1]), z: CGFloat(-values![2]), duration: 0.2))
-        }else {
-            write("Core motion data is nil")
-        }
-    }
+//    func rotatePlane(values : [Float]?) {
+//        if values != nil {
+//            
+//            let orientation = startorientation
+//            let quat = GLKQuaternionMultiply(GLKQuaternionMake(orientation.x, orientation.y, orientation.z, orientation.w), GLKQuaternionMake(values![0], values![1], values![2], values![3]))
+//            
+//            planeNode.orientation = SCNVector4Make(quat.x , quat.y, quat.z, quat.w)
+//            //planeNode.runAction(SCNAction.rotateToX(CGFloat(values![0]), y: CGFloat(values![1]), z: CGFloat(-values![2]), duration: 0.2))
+//        }else {
+//            write("Core motion data is nil")
+//        }
+//    }
     
     @IBAction func button1Pressed() {
         sendButtonPressed("Button 1")
         DrawCanvas.hidden = true
-        messageView.hidden = false
+       // messageView.hidden = false
     }
     
     @IBAction func button2Pressed() {
@@ -207,17 +319,41 @@ class ViewController: UIViewController, TVCTVSessionDelegate {
             
         }else if message.keys.first == "Accelerometer" {
             
-            let temp = message.values.first as! [Float]
+            
+            let tempValue = message.values.first as! [Float]
+            
             //check for change first
-            if (abs(accelData[0] - temp[0]) > 0.01 || abs(accelData[1] - temp[1]) > 0.01 || abs(accelData[2] - temp[2]) > 0.01) && accelData != [0.0,0.0,0.0,0.0] {
+            
+            //quaternions
+            if tempValue.count == 4 {
+            if (abs(previousOrientation.x - tempValue[0]) > 0.01 || abs(previousOrientation.y - tempValue[1]) > 0.01 || abs(previousOrientation.z - tempValue[2]) > 0.01) && !previousOrientation.isZero() {
                 
-                print("rotate by  \(temp)")
-                rotatePlane(message.values.first as? [Float])
-                accelData = message.values.first as! [Float]
-            }else if accelData == [0.0,0.0,0.0, 0.0] {
+                glkRepresentation = GLKQuaternionMake(tempValue[0], tempValue[1], tempValue[2], tempValue[3])
+                print("rotate by  \(tempValue)")
+                previousOrientation = SCNVector4(x: tempValue[0], y: tempValue[1], z: tempValue[2], w: tempValue[3])
+                isSlerping = true
                 
-                accelData = message.values.first as! [Float]
+            }else if previousOrientation.isZero() {
+                
+                previousOrientation = SCNVector4(x: tempValue[0], y: tempValue[1], z: tempValue[2], w: tempValue[3])
+                }
             }
+            
+            //yaw/pitch/roll
+            if tempValue.count == 3 {
+                if (abs(intialYPR[0] - tempValue[0]) > 0.01 || abs(intialYPR[1] - tempValue[1]) > 0.01 || abs(intialYPR[2] - tempValue[2]) > 0.01) && intialYPR != [0.0, 0.0,0.0]{
+                
+                    print("pitch : \(tempValue[0]), yaw: \(tempValue[1]), roll: \(tempValue[2])")
+                    
+                    currentYPR = tempValue
+                    
+                } else if intialYPR == [0.0, 0.0,0.0]{
+                    intialYPR = tempValue
+                    currentYPR = tempValue
+                }
+                
+            }
+
         } else if message.keys.first == "DrawBegin" {
             
             let temp = message.values.first as! [Float]
@@ -233,8 +369,24 @@ class ViewController: UIViewController, TVCTVSessionDelegate {
         } else if message.keys.first == "DrawEnd" {
             
             drawLineFrom(lastPoint, toPoint: lastPoint)
+        }else if message.keys.first == "Speed" {
+            
+            //increase acceleration
+            let value = (message.values.first as! Float)
+            accel += value
+            //this will be redone when integrated w/ the physics
+            if message.values.first as! Int == 0 {
+                
+            }else if accel < -50 {
+                accel = -50
+            } else if accel > 50 {
+                accel = 50
+            }
+            
+            //timer = NSTimer.scheduledTimerWithTimeInterval(0.5, target: self, selector: Selector("OnTimerFired"), userInfo: nil, repeats: true)
+            
         }
-        replyHandler(["Reply":false])
+        replyHandler(["Reply": speed])
     }
     func deviceDidConnect(device: String) {
         self.write("Connected: \(device)")
@@ -242,5 +394,69 @@ class ViewController: UIViewController, TVCTVSessionDelegate {
     func deviceDidDisconnect(device: String) {
         self.write("Disconnected: \(device)")
     }
+    
+    private func OnTimerFired(accelerating : Bool) {
+        
+    }
 }
+
+
+extension SCNQuaternion {
+    
+    /**
+     Checks for empty/all zero quaternions
+     
+     - Returns: returns true if Quaternion is all zero
+     */
+    func isZero() -> Bool {
+        if self.x == 0.0 && self.y == 0.0 && self.z == 0.0 && self.w == 0.0 {
+            return true
+        } else {
+            return false
+        }
+    }
+    
+}
+
+extension SCNVector3 {
+    
+    func multiplyByMatrix4(mat4: SCNMatrix4) -> SCNVector3 {
+        
+        return SCNVector3(
+            self.x * mat4.m11 + self.y * mat4.m21 + self.z * mat4.m31,
+            self.x * mat4.m12 + self.y * mat4.m22 + self.z * mat4.m32,
+            self.x * mat4.m13 + self.y * mat4.m23 + self.z * mat4.m33)
+    }
+    
+    func magnitudeSquared() -> Float {
+        return ((self.x * self.x) + (self.y * self.y) + (self.z + self.z))
+    }
+}
+
+extension GLKQuaternion {
+    
+    
+    /**
+     Finds the angle between two quaternions
+     
+     - Returns: returns the angle in radians
+     
+     */
+    func AngleFromQuaternion(quat : GLKQuaternion) -> Float {
+        let inv = GLKQuaternionInvert(self)
+        
+        let result = GLKQuaternionMultiply(quat, inv)
+        
+        let angle = acosf(result.w) * 2.0
+    
+        if angle > Float(M_PI_2) {
+            
+            return (Float(M_PI) - angle)
+        } else {
+            return angle
+        }
+        
+    }
+}
+
 
