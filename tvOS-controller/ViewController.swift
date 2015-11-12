@@ -138,6 +138,77 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
        // }
     }
     
+    
+    
+    
+    var vehicle:SCNPhysicsVehicle?
+    var chassis:SCNNode?
+//    var reactor:SCNParticleSystem?
+//    var reactorDefaultBirthRate:CGFloat?
+    func configureCar() -> SCNNode! {
+        
+        if let scene = self.accelView.scene {
+            
+            
+            let carScene:SCNScene = SCNScene(named: "gameAssets.scnassets/rc_car")!
+            
+            let chassisNode:SCNNode = carScene.rootNode.childNodeWithName("rccarBody", recursively: false)!
+            chassisNode.position = SCNVector3Make(0, 10, 30)
+            chassisNode.rotation = SCNVector4Make(0, 1, 0, F_PI)
+            
+            let body:SCNPhysicsBody = SCNPhysicsBody.dynamicBody()
+            body.allowsResting = false
+            body.mass = 80
+            body.restitution = 0.1
+            body.friction = 0.5
+            body.rollingFriction = 0
+            
+            chassisNode.physicsBody = body
+            
+            scene.rootNode.addChildNode(chassisNode)
+            
+//            let pipeNode = chassisNode.childNodeWithName("pipe", recursively: true)
+//            self.reactor = SCNParticleSystem(named: "reactor", inDirectory: nil)
+//            self.reactorDefaultBirthRate = self.reactor?.birthRate
+//            self.reactor?.birthRate = 0
+//            pipeNode?.addParticleSystem(self.reactor!)
+            
+            //add wheels
+            let wheel0Node = chassisNode.childNodeWithName("wheelLocator_FL", recursively:true)!
+            let wheel1Node = chassisNode.childNodeWithName("wheelLocator_FR", recursively:true)!
+            let wheel2Node = chassisNode.childNodeWithName("wheelLocator_RL", recursively:true)!
+            let wheel3Node = chassisNode.childNodeWithName("wheelLocator_RR", recursively:true)!
+            
+            let wheel0 = SCNPhysicsVehicleWheel(node: wheel0Node)
+            let wheel1 = SCNPhysicsVehicleWheel(node: wheel1Node)
+            let wheel2 = SCNPhysicsVehicleWheel(node: wheel2Node)
+            let wheel3 = SCNPhysicsVehicleWheel(node: wheel3Node)
+            
+            //var minMax = [SCNVector3](2, SCNVector3Zero)
+            
+            var min = SCNVector3Zero
+            var max = SCNVector3Zero
+            wheel0Node.getBoundingBoxMin(&min, max: &max)
+            let wheelHalfWidth = 0.5 * (max.x - min.x)
+            
+            wheel0.connectionPosition = wheel0Node.convertPosition(SCNVector3Zero, toNode: chassisNode) + SCNVector3(wheelHalfWidth, 0.0, 0.0)
+            wheel1.connectionPosition = wheel1Node.convertPosition(SCNVector3Zero, toNode: chassisNode) - SCNVector3(wheelHalfWidth, 0.0, 0.0)
+            wheel2.connectionPosition = wheel2Node.convertPosition(SCNVector3Zero, toNode: chassisNode) + SCNVector3(wheelHalfWidth, 0.0, 0.0)
+            wheel3.connectionPosition = wheel3Node.convertPosition(SCNVector3Zero, toNode: chassisNode) - SCNVector3(wheelHalfWidth, 0.0, 0.0)
+            
+            self.vehicle = SCNPhysicsVehicle(chassisBody: chassisNode.physicsBody!, wheels: [wheel0, wheel1, wheel2, wheel3])
+            
+            scene.physicsWorld.addBehavior(vehicle!)
+            
+            return chassisNode;
+
+        }
+        else {
+            return nil
+        }
+    }
+    
+    
     func prepareScene(){
         
         accelView.scene = SCNScene()
@@ -161,25 +232,9 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         lightNode.light = light
         lightNode.position = SCNVector3(x: 1.5, y: 1.5, z: 1.5)
         
-        //object
-        let carScene : SCNScene = SCNScene(named: "gameAssets.scnassets/AudiCoupe.dae")!
-        
-        if let tempNode = carScene.rootNode.childNodeWithName("Car", recursively: true){
-            carNode = tempNode
-            carNode.position = SCNVector3(x: 0.0, y: 0.0, z: 0.0)
-            if carNode.geometry == nil {
-                carNode.geometry = SCNBox(width: 1.0, height: 1.0, length: 2.0, chamferRadius: 0.0)
-            }
-            let physicsShape = SCNPhysicsShape(geometry: carNode.geometry!, options: nil)
-            let physicsBody = SCNPhysicsBody(type: .Dynamic, shape: physicsShape)
-            carNode.physicsBody = physicsBody
-            
-            accelView.scene!.rootNode.addChildNode(carNode)
-            
-            //let axisNode = SCNNode()
-        }else {
-            print("Could not load car")
-        }
+        self.chassis = configureCar()
+        self.chassis?.position = SCNVector3(x: 0.0, y: 0.0, z: 0.0)
+
         
         //add some placed boxes
         let box = SCNBox(width: 1.0, height: 1.0, length: 1.0, chamferRadius: 0.0)
@@ -326,6 +381,7 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
             
             //quaternions
             if tempValue.count == 4 {
+                
             if (abs(previousOrientation.x - tempValue[0]) > 0.01 || abs(previousOrientation.y - tempValue[1]) > 0.01 || abs(previousOrientation.z - tempValue[2]) > 0.01) && !previousOrientation.isZero() {
                 
                 glkRepresentation = GLKQuaternionMake(tempValue[0], tempValue[1], tempValue[2], tempValue[3])
@@ -352,7 +408,18 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
                     currentYPR = tempValue
                 }
                 
+                self.vehicle?.setSteeringAngle(CGFloat(currentYPR[0]) * 180.0 / CG_PI, forWheelAtIndex: 0)
+                self.vehicle?.setSteeringAngle(CGFloat(currentYPR[0]) * 180.0 / CG_PI, forWheelAtIndex: 1)
+                self.vehicle?.setSteeringAngle(CGFloat(currentYPR[0]) * 180.0 / CG_PI, forWheelAtIndex: 2)
+                self.vehicle?.setSteeringAngle(CGFloat(currentYPR[0]) * 180.0 / CG_PI, forWheelAtIndex: 3)
+                
             }
+            
+            
+            
+            
+            
+            
 
         } else if message.keys.first == "DrawBegin" {
             
@@ -372,16 +439,25 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         }else if message.keys.first == "Speed" {
             
             //increase acceleration
-            let value = (message.values.first as! Float)
-            accel += value
-            //this will be redone when integrated w/ the physics
-            if message.values.first as! Int == 0 {
-                
-            }else if accel < -50 {
-                accel = -50
-            } else if accel > 50 {
-                accel = 50
+            let value = (message.values.first as! CGFloat) * 10.0
+            
+            if value > 0.0 {
+            
+                self.vehicle?.applyEngineForce(value, forWheelAtIndex: 0)
+                self.vehicle?.applyEngineForce(value, forWheelAtIndex: 1)
+                self.vehicle?.applyEngineForce(value, forWheelAtIndex: 2)
+                self.vehicle?.applyEngineForce(value, forWheelAtIndex: 3)
             }
+            else if value < 0.0 {
+                
+                self.vehicle?.applyBrakingForce(-value, forWheelAtIndex: 0)
+                self.vehicle?.applyBrakingForce(-value, forWheelAtIndex: 1)
+                self.vehicle?.applyBrakingForce(-value, forWheelAtIndex: 2)
+                self.vehicle?.applyBrakingForce(-value, forWheelAtIndex: 3)
+            }
+            
+            print(value)
+            
             
             //timer = NSTimer.scheduledTimerWithTimeInterval(0.5, target: self, selector: Selector("OnTimerFired"), userInfo: nil, repeats: true)
             
