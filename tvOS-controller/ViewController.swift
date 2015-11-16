@@ -367,12 +367,12 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
             
             
             if accel > 0.0 {
-                self.acceleration = accel * 30.0
+                self.acceleration = accel * 200.0
                 
             }
             else if accel < 0.0 {
                 self.acceleration = 0.0
-                self.brake = -accel * 3.0
+                self.brake = -accel * 5.0
             }
             else {
                 self.acceleration = 0.0
@@ -389,7 +389,6 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
             
         }
         if let steer = message["Steering"] as? CGFloat {
-            print("Steering: \(steer)")
             replyHandler(["STEER": steer])
             self.vehicle?.setSteeringAngle(steer, forWheelAtIndex: 0)
             self.vehicle?.setSteeringAngle(steer, forWheelAtIndex: 1)
