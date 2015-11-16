@@ -242,7 +242,12 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         
         self.chassis = configureCar()
         self.chassis?.position = SCNVector3(x: 0.0, y: 0.0, z: 0.0)
+        
+        let cameraConstraint = SCNLookAtConstraint(target: self.chassis!)
+        cameraConstraint.gimbalLockEnabled = true
 
+        cameraNode.constraints = [cameraConstraint]
+        
         
         //add some placed boxes
         let box = SCNBox(width: 1.0, height: 1.0, length: 1.0, chamferRadius: 0.0)
@@ -277,7 +282,6 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         //constraints
         let constraint = SCNLookAtConstraint(target: carNode)
         
-        cameraNode.constraints = [constraint]
         lightNode.constraints = [constraint]
         
         accelView.scene!.rootNode.addChildNode(cameraNode)
