@@ -59,6 +59,10 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
     // draw
     var lastPoint = CGPoint.zero
     
+    
+    var acceleration:CGFloat = 0.0
+    var brake:CGFloat = 0.0
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -80,19 +84,13 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
     }
     
     func renderer(renderer: SCNSceneRenderer, didSimulatePhysicsAtTime time: NSTimeInterval) {
+
+        self.vehicle?.applyEngineForce(self.acceleration, forWheelAtIndex: 2)
+        self.vehicle?.applyEngineForce(self.acceleration, forWheelAtIndex: 3)
         
-        //physics updates here
-        
-        //print(time)
-        if firstRun {
-            //time zero
-            updateCar(0.0)
-            initialTime = time
-            firstRun = false
-        } else {
-            updateCar((time - initialTime))
-            initialTime = time
-        }
+        self.vehicle?.applyBrakingForce(self.brake, forWheelAtIndex: 2)
+        self.vehicle?.applyBrakingForce(self.brake, forWheelAtIndex: 3)
+
     }
     
     func updateCar(delta: NSTimeInterval) {
@@ -354,6 +352,104 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         self.write("Message received: \(message) from: \(fromDevice)")
     }
     func didReceiveMessage(message: [String : AnyObject], fromDevice: String, replyHandler: ([String : AnyObject]) -> Void) {
+        
+        if let accel = message["Speed"] as? CGFloat {
+            
+            
+            if accel > 0.0 {
+                self.acceleration = accel * 30.0
+                
+            }
+            else if accel < 0.0 {
+                self.acceleration = 0.0
+                self.brake = -accel * 3.0
+            }
+            else {
+                self.acceleration = 0.0
+                self.brake = 0.0
+                
+            }
+            
+            
+            print(accel)
+            
+            replyHandler(["Reply": accel])
+            
+            return
+            
+        }
+        if let steer = message["Steering"] as? CGFloat {
+            print("Steering: \(steer)")
+            replyHandler(["STEER": steer])
+            self.vehicle?.setSteeringAngle(steer, forWheelAtIndex: 0)
+            self.vehicle?.setSteeringAngle(steer, forWheelAtIndex: 1)
+            
+            return
+        }
+        
+        
+        if let quatData = message["Accelerometer"] as? [CGFloat] where quatData.count == 4 {
+//            let quat = SCNQuaternion(quatData[0], quatData[1], quatData[2], quatData[3])
+//            
+//            print (quat)
+//            
+//            let tempValue = message.values.first as! [Float]
+//            
+//            //check for change first
+//            
+//            //quaternions
+//            if tempValue.count == 4 {
+//                
+//                if (abs(previousOrientation.x - tempValue[0]) > 0.01 || abs(previousOrientation.y - tempValue[1]) > 0.01 || abs(previousOrientation.z - tempValue[2]) > 0.01) && !previousOrientation.isZero() {
+//                    
+//                    glkRepresentation = GLKQuaternionMake(tempValue[0], tempValue[1], tempValue[2], tempValue[3])
+//                    print("rotate by  \(tempValue)")
+//                    previousOrientation = SCNVector4(x: tempValue[0], y: tempValue[1], z: tempValue[2], w: tempValue[3])
+//                    isSlerping = true
+//                    
+//                }else if previousOrientation.isZero() {
+//                    
+//                    previousOrientation = SCNVector4(x: tempValue[0], y: tempValue[1], z: tempValue[2], w: tempValue[3])
+//                }
+//            }
+//            
+//
+//            replyHandler(["Reply": speed])
+//            
+//            return
+        }
+        else if let ypr = message["Accelerometer"] as? [Float] where ypr.count == 3 {
+            
+//            //yaw/pitch/roll
+//            let dYPR0 = abs(intialYPR[0] - ypr[0])
+//            let dYPR1 = abs(intialYPR[1] - ypr[1])
+//            let dYPR2 = abs(intialYPR[2] - ypr[2])
+//            
+//                if (dYPR0 > 0.01 || dYPR1 > 0.01 || dYPR2 > 0.01) && intialYPR != [0.0, 0.0,0.0] {
+//                    
+//                    print("pitch : \(ypr[0]), yaw: \(ypr[1]), roll: \(ypr[2])")
+//                    
+//                    currentYPR = ypr
+//                    
+//                } else if intialYPR == [0.0, 0.0,0.0]{
+//                    intialYPR = ypr
+//                    currentYPR = ypr
+//                }
+//                
+//                self.vehicle?.setSteeringAngle(CGFloat(ypr[0]) * 180.0 / CG_PI, forWheelAtIndex: 0)
+//                self.vehicle?.setSteeringAngle(CGFloat(ypr[0]) * 180.0 / CG_PI, forWheelAtIndex: 1)
+////                self.vehicle?.setSteeringAngle(CGFloat(currentYPR[0]) * 180.0 / CG_PI, forWheelAtIndex: 2)
+////                self.vehicle?.setSteeringAngle(CGFloat(currentYPR[0]) * 180.0 / CG_PI, forWheelAtIndex: 3)
+//            
+//            replyHandler(["Reply": speed])
+//            
+//            return
+//            
+            
+        }
+        
+        
+        
         self.didReceiveMessage(message, fromDevice: fromDevice)
         //detect which form of data is being sent over
         if message.keys.first == "Button" {
@@ -372,98 +468,30 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
                 break
             }
             
-        }else if message.keys.first == "Accelerometer" {
-            
-            
-            let tempValue = message.values.first as! [Float]
-            
-            //check for change first
-            
-            //quaternions
-            if tempValue.count == 4 {
-                
-            if (abs(previousOrientation.x - tempValue[0]) > 0.01 || abs(previousOrientation.y - tempValue[1]) > 0.01 || abs(previousOrientation.z - tempValue[2]) > 0.01) && !previousOrientation.isZero() {
-                
-                glkRepresentation = GLKQuaternionMake(tempValue[0], tempValue[1], tempValue[2], tempValue[3])
-                print("rotate by  \(tempValue)")
-                previousOrientation = SCNVector4(x: tempValue[0], y: tempValue[1], z: tempValue[2], w: tempValue[3])
-                isSlerping = true
-                
-            }else if previousOrientation.isZero() {
-                
-                previousOrientation = SCNVector4(x: tempValue[0], y: tempValue[1], z: tempValue[2], w: tempValue[3])
-                }
-            }
-            
-            //yaw/pitch/roll
-            if tempValue.count == 3 {
-                if (abs(intialYPR[0] - tempValue[0]) > 0.01 || abs(intialYPR[1] - tempValue[1]) > 0.01 || abs(intialYPR[2] - tempValue[2]) > 0.01) && intialYPR != [0.0, 0.0,0.0]{
-                
-                    print("pitch : \(tempValue[0]), yaw: \(tempValue[1]), roll: \(tempValue[2])")
-                    
-                    currentYPR = tempValue
-                    
-                } else if intialYPR == [0.0, 0.0,0.0]{
-                    intialYPR = tempValue
-                    currentYPR = tempValue
-                }
-                
-                self.vehicle?.setSteeringAngle(CGFloat(currentYPR[0]) * 180.0 / CG_PI, forWheelAtIndex: 0)
-                self.vehicle?.setSteeringAngle(CGFloat(currentYPR[0]) * 180.0 / CG_PI, forWheelAtIndex: 1)
-                self.vehicle?.setSteeringAngle(CGFloat(currentYPR[0]) * 180.0 / CG_PI, forWheelAtIndex: 2)
-                self.vehicle?.setSteeringAngle(CGFloat(currentYPR[0]) * 180.0 / CG_PI, forWheelAtIndex: 3)
-                
-            }
-            
-            
-            
-            
-            
-            
-
-        } else if message.keys.first == "DrawBegin" {
+        }
+        else if message.keys.first == "DrawBegin" {
             
             let temp = message.values.first as! [Float]
             lastPoint = CGPoint(x: CGFloat(temp[0]), y: CGFloat(temp[1]))
             
-        } else if message.keys.first == "DrawMove" {
+        }
+        else if message.keys.first == "DrawMove" {
             
             let temp = message.values.first as! [Float]
             let currentPoint = CGPoint(x: CGFloat(temp[0]), y: CGFloat(temp[1]))
             
             drawLineFrom(lastPoint, toPoint: currentPoint)
             lastPoint = currentPoint
-        } else if message.keys.first == "DrawEnd" {
+        }
+        else if message.keys.first == "DrawEnd" {
             
             drawLineFrom(lastPoint, toPoint: lastPoint)
-        }else if message.keys.first == "Speed" {
-            
-            //increase acceleration
-            let value = (message.values.first as! CGFloat) * 10.0
-            
-            if value > 0.0 {
-            
-                self.vehicle?.applyEngineForce(value, forWheelAtIndex: 0)
-                self.vehicle?.applyEngineForce(value, forWheelAtIndex: 1)
-                self.vehicle?.applyEngineForce(value, forWheelAtIndex: 2)
-                self.vehicle?.applyEngineForce(value, forWheelAtIndex: 3)
-            }
-            else if value < 0.0 {
-                
-                self.vehicle?.applyBrakingForce(-value, forWheelAtIndex: 0)
-                self.vehicle?.applyBrakingForce(-value, forWheelAtIndex: 1)
-                self.vehicle?.applyBrakingForce(-value, forWheelAtIndex: 2)
-                self.vehicle?.applyBrakingForce(-value, forWheelAtIndex: 3)
-            }
-            
-            print(value)
-            
-            
-            //timer = NSTimer.scheduledTimerWithTimeInterval(0.5, target: self, selector: Selector("OnTimerFired"), userInfo: nil, repeats: true)
-            
         }
         replyHandler(["Reply": speed])
+        
     }
+    
+    
     func deviceDidConnect(device: String) {
         self.write("Connected: \(device)")
     }

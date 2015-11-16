@@ -10,6 +10,8 @@ import UIKit
 import CoreMotion
 import SceneKit
 
+let STEERING_CLAMP = 0.6
+
 class ViewController: UIViewController, TVCPhoneSessionDelegate {
     
     let remote = TVCPhoneSession()
@@ -35,36 +37,20 @@ class ViewController: UIViewController, TVCPhoneSessionDelegate {
     @IBAction func button1Pressed() {
         send("Button", text: 1)
         buttonEnabled = 1
-        
-        //set up accelerometer readings
-        
-        if motion.deviceMotionAvailable {
-            motion.deviceMotionUpdateInterval = 0.5
-            motion.startDeviceMotionUpdatesToQueue(NSOperationQueue.mainQueue(), withHandler: { (data: CMDeviceMotion?, error :NSError?) -> Void in
-                if error == nil && data != nil {
-                    
-                    let temp = data!.attitude
-                    
-                    let accel : [Float] = [Float(temp.pitch), Float(temp.yaw), Float(temp.roll)]
-                    self.send("Accelerometer", text: accel)
-                }else {
-                    self.write((error?.localizedDescription)!)
-                }
-            })
-        }
+
 
     }
 
     @IBAction func button2Pressed() {
         send("Button", text: 2)
         buttonEnabled = 2
-        motion.stopDeviceMotionUpdates()
+      //  motion.stopDeviceMotionUpdates()
 
     }
     @IBAction func button3Pressed() {
         send("Button", text: 3)
         buttonEnabled = 3
-        motion.stopDeviceMotionUpdates()
+       // motion.stopDeviceMotionUpdates()
 
     }
     //Button tap controls
@@ -142,11 +128,66 @@ class ViewController: UIViewController, TVCPhoneSessionDelegate {
         // Do any additional setup after loading the view, typically from a nib.
     }
     
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        
+        //set up accelerometer readings
+        
+        if motion.deviceMotionAvailable {
+            motion.deviceMotionUpdateInterval = 0.05
+            
+            var lastSteeringValueSent:Double? = nil
+            var ready = true
+            motion.startDeviceMotionUpdatesToQueue(NSOperationQueue.mainQueue()) {
+                (motionInfo: CMDeviceMotion?, errorInfo :NSError?) -> Void in
+                
+                if ready, let motion = motionInfo {
+                    
+                    let newValue = min(max(-Double(motion.attitude.pitch), -STEERING_CLAMP), STEERING_CLAMP)
+                    
+                    var sendValue:Double? = nil
+                    if let lastSteering = lastSteeringValueSent where abs(newValue - lastSteering) > 0.001 {
+                        sendValue = newValue
+                    }
+                    else if lastSteeringValueSent == nil {
+                        sendValue = newValue
+                    }
+                    
+                    if self.remote.connected, let sv = sendValue {
+                        ready = false
+                        self.remote.sendMessage(["Steering":sv],
+                            replyHandler: {
+                                (reply) -> Void in
+                                ready = true
+                            }, errorHandler: {
+                                (error) -> Void in
+                                ready = true
+                        })
+                        lastSteeringValueSent = sv
+                    }
+                    
+                }
+                else if let error = errorInfo {
+                    self.write(error.localizedDescription)
+                }
+                
+            }
+        }
+        
+    }
+    
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
         
         let value = UIInterfaceOrientation.LandscapeLeft.rawValue
         UIDevice.currentDevice().setValue(value, forKey: "orientation")
+    }
+    
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+        motion.stopDeviceMotionUpdates()
+        
     }
 
     override func didReceiveMemoryWarning() {
