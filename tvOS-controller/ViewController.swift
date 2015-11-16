@@ -26,6 +26,9 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
     
     @IBOutlet weak var DrawCanvas : UIImageView!
     
+    @IBOutlet var speed: UILabel!
+    var prevSpeed:Int = 0
+    
     var gameObjects = [GameObject]()
     var timer = NSTimer()
 
@@ -45,10 +48,10 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
     var boxNode2 = SCNNode()
     
     //update variables
-    var accel : Float = 0.0
-    var speed : Float = 0.0
+    //var accel : Float = 0.0
+    //var speed : Float = 0.0
     var previousOrientation = SCNQuaternion()
-    var glkRepresentation = GLKQuaternion()
+    //var glkRepresentation = GLKQuaternion()
     var slerp = 0.0
     var isSlerping = false
     
@@ -91,52 +94,59 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         self.vehicle?.applyBrakingForce(self.brake, forWheelAtIndex: 2)
         self.vehicle?.applyBrakingForce(self.brake, forWheelAtIndex: 3)
 
+        let intSpeed = Int((self.vehicle?.speedInKilometersPerHour ?? 0.0) * 100.0 + 0.5)
+        if prevSpeed != intSpeed {
+            let text = "\(CGFloat(intSpeed) * 0.01) km/h"
+            dispatch_async(dispatch_get_main_queue(), {self.speed.text = text})
+            prevSpeed = intSpeed
+        }
+        
     }
     
-    func updateCar(delta: NSTimeInterval) {
-        
-        //move car in the direction it is currently facing
-
-        carNode.runAction(SCNAction.moveByX(CGFloat(vectorToMoveBy.x * Float(delta) * (accel)), y: 0.0, z: CGFloat(vectorToMoveBy.z * Float(delta) * (accel)), duration: delta))
-        speed = vectorToMoveBy.magnitudeSquared()
-        cameraNode.position = SCNVector3(carNode.position.x + 10, carNode.position.y + 10, carNode.position.z)
-//        if isSlerping {
-//            slerp += delta
+//    func updateCar(delta: NSTimeInterval) {
+//        
+//        //move car in the direction it is currently facing
+//
+//        carNode.runAction(SCNAction.moveByX(CGFloat(vectorToMoveBy.x * Float(delta) * (accel)), y: 0.0, z: CGFloat(vectorToMoveBy.z * Float(delta) * (accel)), duration: delta))
+//        speed = vectorToMoveBy.magnitudeSquared()
+//        cameraNode.position = SCNVector3(carNode.position.x + 10, carNode.position.y + 10, carNode.position.z)
+////        if isSlerping {
+////            slerp += delta
+////            
+////            var slerpAmount = slerp / 1.0
+////            
+////            if slerpAmount > 1.0 {
+////                slerpAmount = 1.0
+////                isSlerping = false
+////            }
+////            
+//           // let tempGLK = GLKQuaternionMake(carNode.orientation.x, carNode.orientation.y, carNode.orientation.z, carNode.orientation.w)
 //            
-//            var slerpAmount = slerp / 1.0
+//           // let result = GLKQuaternionSlerp(tempGLK, glkRepresentation, Float(slerpAmount))
 //            
-//            if slerpAmount > 1.0 {
-//                slerpAmount = 1.0
-//                isSlerping = false
-//            }
+//            //carNode.orientation.y = result.y
 //            
-           // let tempGLK = GLKQuaternionMake(carNode.orientation.x, carNode.orientation.y, carNode.orientation.z, carNode.orientation.w)
-            
-           // let result = GLKQuaternionSlerp(tempGLK, glkRepresentation, Float(slerpAmount))
-            
-            //carNode.orientation.y = result.y
-            
-            //let angle = tempGLK.AngleFromQuaternion(result)
-        
-            let angle = (currentYPR[0]) //pitch
-            
-            carNode.runAction((SCNAction.rotateByAngle(CGFloat(angle * Float(delta)), aroundAxis: SCNVector3(0, 1, 0), duration: delta)), completionHandler: { () -> Void in
-                self.intialYPR = self.currentYPR
-            })
-            
-            let matrix = SCNMatrix4MakeRotation((angle  * Float(delta)), 0, 1, 0)
-            
-            vectorToMoveBy = vectorToMoveBy.multiplyByMatrix4(matrix)
-        
-           // intialYPR = [carNode.eulerAngles.x, carNode.eulerAngles.y, carNode.eulerAngles.z]
-
-            //let temp = GLKQuaternionRotateVector3(result, GLKVector3(v: (vectorToMoveBy.x, vectorToMoveBy.y, vectorToMoveBy.z)))
-            //vectorToMoveBy = SCNVector3(temp.x, temp.y, temp.z)
-            
-       // }
-    }
-    
-    
+//            //let angle = tempGLK.AngleFromQuaternion(result)
+//        
+//            let angle = (currentYPR[0]) //pitch
+//            
+//            carNode.runAction((SCNAction.rotateByAngle(CGFloat(angle * Float(delta)), aroundAxis: SCNVector3(0, 1, 0), duration: delta)), completionHandler: { () -> Void in
+//                self.intialYPR = self.currentYPR
+//            })
+//            
+//            let matrix = SCNMatrix4MakeRotation((angle  * Float(delta)), 0, 1, 0)
+//            
+//            vectorToMoveBy = vectorToMoveBy.multiplyByMatrix4(matrix)
+//        
+//           // intialYPR = [carNode.eulerAngles.x, carNode.eulerAngles.y, carNode.eulerAngles.z]
+//
+//            //let temp = GLKQuaternionRotateVector3(result, GLKVector3(v: (vectorToMoveBy.x, vectorToMoveBy.y, vectorToMoveBy.z)))
+//            //vectorToMoveBy = SCNVector3(temp.x, temp.y, temp.z)
+//            
+//       // }
+//    }
+//    
+//    
     
     
     var vehicle:SCNPhysicsVehicle?
