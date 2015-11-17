@@ -23,7 +23,6 @@
 		27BFD3181BE7868C00AB28D5 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BFD3171BE7868C00AB28D5 /* ViewController.swift */; };
 		27BFD31B1BE7868C00AB28D5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 27BFD3191BE7868C00AB28D5 /* Main.storyboard */; };
 		27BFD31D1BE7868C00AB28D5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 27BFD31C1BE7868C00AB28D5 /* Assets.xcassets */; };
-		27C45BDA1BF503EE00163127 /* CarNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C45BD91BF503EE00163127 /* CarNode.swift */; };
 		B90B246E1BF4C7A8005B3631 /* PhysicsComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = B90B246D1BF4C7A8005B3631 /* PhysicsComponent.swift */; };
 		B92C0B0E1BE8D85800FF16C9 /* SceneKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B92C0B0D1BE8D85800FF16C9 /* SceneKit.framework */; };
 		B92C0B101BE8E05000FF16C9 /* SceneKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B92C0B0F1BE8E05000FF16C9 /* SceneKit.framework */; };
@@ -54,7 +53,6 @@
 		27BFD31A1BE7868C00AB28D5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		27BFD31C1BE7868C00AB28D5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		27BFD31E1BE7868C00AB28D5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		27C45BD91BF503EE00163127 /* CarNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CarNode.swift; sourceTree = "<group>"; };
 		B90B246D1BF4C7A8005B3631 /* PhysicsComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhysicsComponent.swift; sourceTree = "<group>"; };
 		B92C0B0D1BE8D85800FF16C9 /* SceneKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SceneKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.1.sdk/System/Library/Frameworks/SceneKit.framework; sourceTree = DEVELOPER_DIR; };
 		B92C0B0F1BE8E05000FF16C9 /* SceneKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SceneKit.framework; path = System/Library/Frameworks/SceneKit.framework; sourceTree = SDKROOT; };
@@ -145,7 +143,6 @@
 				27BFD3171BE7868C00AB28D5 /* ViewController.swift */,
 				274952811BFB2DBF0068C8A1 /* Extensions.swift */,
 				27BFD3191BE7868C00AB28D5 /* Main.storyboard */,
-				27C45BD91BF503EE00163127 /* CarNode.swift */,
 				27BFD31C1BE7868C00AB28D5 /* Assets.xcassets */,
 				B94124321BECFE9B0077B71E /* gameAssets.scnassets */,
 				27BFD31E1BE7868C00AB28D5 /* Info.plist */,
@@ -276,7 +273,6 @@
 				B90B246E1BF4C7A8005B3631 /* PhysicsComponent.swift in Sources */,
 				2703A0951BE7876A00397389 /* TVCTVSession.swift in Sources */,
 				2703A08F1BE7876A00397389 /* GCDAsyncSocket.m in Sources */,
-				27C45BDA1BF503EE00163127 /* CarNode.swift in Sources */,
 				27BFD3181BE7868C00AB28D5 /* ViewController.swift in Sources */,
 				2703A0911BE7876A00397389 /* SharedKeys.swift in Sources */,
 				27BFD3161BE7868C00AB28D5 /* AppDelegate.swift in Sources */,

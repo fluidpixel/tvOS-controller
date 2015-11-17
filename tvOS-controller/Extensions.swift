@@ -10,6 +10,16 @@ import Foundation
 import SceneKit
 import GLKit
 
+let CG_PI = CGFloat(M_PI)
+let F_PI = Float(M_PI)
+
+func + (l:SCNVector3, r:SCNVector3) -> SCNVector3 {
+    return SCNVector3(l.x + r.x, l.y + r.y, l.z + r.z)
+}
+func - (l:SCNVector3, r:SCNVector3) -> SCNVector3 {
+    return SCNVector3(l.x - r.x, l.y - r.y, l.z - r.z)
+}
+
 
 extension SCNQuaternion {
     

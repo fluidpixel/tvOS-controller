@@ -100,11 +100,17 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
     var check = 0
     func renderer(renderer: SCNSceneRenderer, didSimulatePhysicsAtTime time: NSTimeInterval) {
 
-        self.vehicle?.applyEngineForce(self.acceleration, forWheelAtIndex: 2)
-        self.vehicle?.applyEngineForce(self.acceleration, forWheelAtIndex: 3)
+//        self.vehicle?.applyEngineForce(self.acceleration, forWheelAtIndex: 2)
+//        self.vehicle?.applyEngineForce(self.acceleration, forWheelAtIndex: 3)
+//        
+//        self.vehicle?.applyBrakingForce(self.brake, forWheelAtIndex: 2)
+//        self.vehicle?.applyBrakingForce(self.brake, forWheelAtIndex: 3)
         
-        self.vehicle?.applyBrakingForce(self.brake, forWheelAtIndex: 2)
-        self.vehicle?.applyBrakingForce(self.brake, forWheelAtIndex: 3)
+        self.vehicle?.applyEngineForce(self.acceleration, forWheelAtIndex: 0)
+        self.vehicle?.applyEngineForce(self.acceleration, forWheelAtIndex: 1)
+        
+        self.vehicle?.applyBrakingForce(self.brake, forWheelAtIndex: 0)
+        self.vehicle?.applyBrakingForce(self.brake, forWheelAtIndex: 1)
 
         let intSpeed = Int((self.vehicle?.speedInKilometersPerHour ?? 0.0) * 100.0 + 0.5)
         if prevSpeed != intSpeed {
@@ -221,7 +227,7 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         let light = SCNLight()
         light.type = SCNLightTypeDirectional
         light.castsShadow = true
-        
+        light.zFar = 10.0
         lightNode.light = light
         
         self.chassis = configureCar()
@@ -275,7 +281,7 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
             var max = SCNVector3Zero
             geometry.getBoundingBoxMin(&min, max: &max)
             geometry.firstMaterial?.diffuse.contents = colours[colRNG.nextInt()]
-            geometry.firstMaterial?.transparency = 0.7
+            //geometry.firstMaterial?.transparency = 1.0
             geometry.firstMaterial?.doubleSided = true
             
             node.position = SCNVector3(CGFloat(xy.nextUniform()) * 100.0, -CGFloat(min.y) * 2.0, CGFloat(xy.nextUniform()) * 100.0)
