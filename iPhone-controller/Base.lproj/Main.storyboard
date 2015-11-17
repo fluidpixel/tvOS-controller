@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9059" systemVersion="14F1021" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9059" systemVersion="14F1021" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="QJu-wM-rib">
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9049"/>
@@ -136,10 +136,122 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="434" y="460"/>
+            <point key="canvasLocation" x="1408" y="417"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="yQv-e1-pn1">
+            <objects>
+                <viewController id="QJu-wM-rib" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="rM6-nf-3ea"/>
+                        <viewControllerLayoutGuide type="bottom" id="doG-e6-eU4"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="BSH-sN-Pc6">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Party Racer" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zsb-WA-Mzu">
+                                <rect key="frame" x="230" y="28" width="141" height="53"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ubm-iM-Byw">
+                                <rect key="frame" x="228" y="276" width="145" height="47"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
+                                <state key="normal" title="Start Game"/>
+                                <connections>
+                                    <segue destination="eDO-kA-9sd" kind="show" id="oON-f6-AFg"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="0Py-yG-pP4" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="82" y="417"/>
+        </scene>
+        <!--Player Select Controller-->
+        <scene sceneID="oi3-d2-dbb">
+            <objects>
+                <viewController id="eDO-kA-9sd" customClass="PlayerSelectController" customModule="iPhone_controller" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="O7P-li-4Aq"/>
+                        <viewControllerLayoutGuide type="bottom" id="3Kd-3v-rfr"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="DM4-3y-SjF">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Waiting For Players" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JXK-YK-L3P">
+                                <rect key="frame" x="185" y="28" width="230" height="32"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="ejo-5Y-ihO">
+                                <rect key="frame" x="390" y="210" width="20" height="20"/>
+                            </activityIndicatorView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Connecting to TV..." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2Gu-vs-ETN">
+                                <rect key="frame" x="218" y="203" width="164" height="34"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Colour" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DFF-Aa-NWL">
+                                <rect key="frame" x="265" y="391" width="70" height="20"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BeB-gu-OEh">
+                                <rect key="frame" x="336" y="351" width="100" height="100"/>
+                                <state key="normal" image="Arrowright"/>
+                                <connections>
+                                    <action selector="ChangeColourRight:" destination="eDO-kA-9sd" eventType="touchUpInside" id="23u-we-vcI"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6V6-uE-T3n">
+                                <rect key="frame" x="157" y="351" width="100" height="100"/>
+                                <state key="normal" title="Button" image="ArrowLeft"/>
+                                <connections>
+                                    <action selector="ChangeColourLeft:" destination="eDO-kA-9sd" eventType="touchUpInside" id="423-0R-Ey4"/>
+                                </connections>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="-/4" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="n84-RZ-tcK">
+                                <rect key="frame" x="267" y="68" width="66" height="34"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle2"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DUF-Re-DRh">
+                                <rect key="frame" x="264" y="550" width="72" height="30"/>
+                                <state key="normal" title="READY"/>
+                                <connections>
+                                    <action selector="Ready:" destination="eDO-kA-9sd" eventType="touchUpInside" id="XdH-nR-PPO"/>
+                                    <segue destination="BYZ-38-t0r" kind="show" identifier="Start" id="gbh-Ce-nL4"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <connections>
+                        <outlet property="ColourLabel" destination="DFF-Aa-NWL" id="jMk-ZT-oAp"/>
+                        <outlet property="ConnectionStateLabel" destination="2Gu-vs-ETN" id="asU-eE-JAm"/>
+                        <outlet property="activityView" destination="ejo-5Y-ihO" id="Ace-CE-gTc"/>
+                        <outlet property="numberOfPlayersLabel" destination="n84-RZ-tcK" id="vHF-Tp-f3t"/>
+                        <outlet property="playerslabel" destination="JXK-YK-L3P" id="IKf-gm-K8z"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="4mA-nJ-DZm" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="738" y="417"/>
         </scene>
     </scenes>
     <resources>
+        <image name="ArrowLeft" width="256" height="256"/>
+        <image name="Arrowright" width="512" height="512"/>
         <image name="button" width="640" height="640"/>
         <image name="button-stop" width="640" height="640"/>
     </resources>

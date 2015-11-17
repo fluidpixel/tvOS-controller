@@ -12,7 +12,7 @@ import SceneKit
 
 class ViewController: UIViewController, TVCPhoneSessionDelegate {
     
-    let remote = TVCPhoneSession()
+    var remote = TVCPhoneSession()
     let motion = CMMotionManager()
     
     var buttonEnabled = 0

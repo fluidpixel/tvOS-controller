@@ -11,7 +11,7 @@ import UIKit
 
 let SERVICE_NAME = "_probonjore._tcp."
 
-let NET_SERVICE_NAME = "com.fpstudios.iPhone-controller"
+let NET_SERVICE_NAME = "com.fpstudios.iPhone-controller Lauren"
 
 let CURRENT_DEVICE_VENDOR_ID:String = UIDevice.currentDevice().identifierForVendor!.UUIDString
 

@@ -23,11 +23,14 @@
 		27BFD31B1BE7868C00AB28D5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 27BFD3191BE7868C00AB28D5 /* Main.storyboard */; };
 		27BFD31D1BE7868C00AB28D5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 27BFD31C1BE7868C00AB28D5 /* Assets.xcassets */; };
 		B90B246E1BF4C7A8005B3631 /* PhysicsComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = B90B246D1BF4C7A8005B3631 /* PhysicsComponent.swift */; };
+		B9295B811BFA21EB00F0597C /* TitleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9295B801BFA21EB00F0597C /* TitleViewController.swift */; };
+		B9295B831BFA255B00F0597C /* PlayersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9295B821BFA255B00F0597C /* PlayersViewController.swift */; };
 		B92C0B0E1BE8D85800FF16C9 /* SceneKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B92C0B0D1BE8D85800FF16C9 /* SceneKit.framework */; };
 		B92C0B101BE8E05000FF16C9 /* SceneKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B92C0B0F1BE8E05000FF16C9 /* SceneKit.framework */; };
 		B941242B1BECC70A0077B71E /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = B941242A1BECC70A0077B71E /* GameScene.swift */; };
 		B94124331BECFE9B0077B71E /* gameAssets.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = B94124321BECFE9B0077B71E /* gameAssets.scnassets */; };
 		B94124341BECFE9B0077B71E /* gameAssets.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = B94124321BECFE9B0077B71E /* gameAssets.scnassets */; };
+		B9FE032C1BFB75010064171E /* PlayerSelectController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9FE032B1BFB75010064171E /* PlayerSelectController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -52,10 +55,13 @@
 		27BFD31C1BE7868C00AB28D5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		27BFD31E1BE7868C00AB28D5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B90B246D1BF4C7A8005B3631 /* PhysicsComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhysicsComponent.swift; sourceTree = "<group>"; };
+		B9295B801BFA21EB00F0597C /* TitleViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TitleViewController.swift; sourceTree = "<group>"; };
+		B9295B821BFA255B00F0597C /* PlayersViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayersViewController.swift; sourceTree = "<group>"; };
 		B92C0B0D1BE8D85800FF16C9 /* SceneKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SceneKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.1.sdk/System/Library/Frameworks/SceneKit.framework; sourceTree = DEVELOPER_DIR; };
 		B92C0B0F1BE8E05000FF16C9 /* SceneKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SceneKit.framework; path = System/Library/Frameworks/SceneKit.framework; sourceTree = SDKROOT; };
 		B941242A1BECC70A0077B71E /* GameScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		B94124321BECFE9B0077B71E /* gameAssets.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = gameAssets.scnassets; sourceTree = "<group>"; };
+		B9FE032B1BFB75010064171E /* PlayerSelectController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerSelectController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +93,7 @@
 				2703A07D1BE786F000397389 /* Assets.xcassets */,
 				2703A07F1BE786F000397389 /* LaunchScreen.storyboard */,
 				2703A0821BE786F000397389 /* Info.plist */,
+				B9FE032B1BFB75010064171E /* PlayerSelectController.swift */,
 			);
 			path = "iPhone-controller";
 			sourceTree = "<group>";
@@ -145,6 +152,8 @@
 				27BFD31E1BE7868C00AB28D5 /* Info.plist */,
 				B941242A1BECC70A0077B71E /* GameScene.swift */,
 				B90B246D1BF4C7A8005B3631 /* PhysicsComponent.swift */,
+				B9295B801BFA21EB00F0597C /* TitleViewController.swift */,
+				B9295B821BFA255B00F0597C /* PlayersViewController.swift */,
 			);
 			path = "tvOS-controller";
 			sourceTree = "<group>";
@@ -257,6 +266,7 @@
 				2703A0941BE7876A00397389 /* TVCPhoneSession.swift in Sources */,
 				2703A0791BE786F000397389 /* ViewController.swift in Sources */,
 				2703A0921BE7876A00397389 /* SharedKeys.swift in Sources */,
+				B9FE032C1BFB75010064171E /* PlayerSelectController.swift in Sources */,
 				2703A0771BE786F000397389 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -270,8 +280,10 @@
 				2703A0951BE7876A00397389 /* TVCTVSession.swift in Sources */,
 				2703A08F1BE7876A00397389 /* GCDAsyncSocket.m in Sources */,
 				27BFD3181BE7868C00AB28D5 /* ViewController.swift in Sources */,
+				B9295B811BFA21EB00F0597C /* TitleViewController.swift in Sources */,
 				2703A0911BE7876A00397389 /* SharedKeys.swift in Sources */,
 				27BFD3161BE7868C00AB28D5 /* AppDelegate.swift in Sources */,
+				B9295B831BFA255B00F0597C /* PlayersViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

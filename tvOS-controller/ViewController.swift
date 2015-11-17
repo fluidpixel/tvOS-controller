@@ -28,10 +28,14 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
     
     var gameObjects = [GameObject]()
     var timer = NSTimer()
+    
+    //vehicles
+    var vehicle: SCNPhysicsVehicle?
 
     var vectorToMoveBy = SCNVector3(0, 0, 1)
     var firstRun = true
     var initialTime = 0.0
+    var numberOfPlayers = 4
     //testing
     let angle = sin(M_PI_4 / 2.0)
     
@@ -40,6 +44,7 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
     let lightNode = SCNNode()
     var groundNode = SCNNode()
     var carNode = SCNNode()
+    var trackNode = SCNNode()
     //boxes
     var boxNode = SCNNode()
     var boxNode2 = SCNNode()
@@ -141,11 +146,11 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
     func prepareScene(){
         
         accelView.scene = SCNScene()
-        //accelView.scene!.physicsWorld.gravity = SCNVector3(x: 0.0, y: 0.0, z: 0.0)
+        accelView.scene!.physicsWorld.gravity = SCNVector3(x: 0.0, y: -9.8, z: 0.0)
         //camera
         let camera = SCNCamera()
         cameraNode.camera = camera
-        cameraNode.position = SCNVector3(-10.0, 5.0, 10.0)
+        cameraNode.position = SCNVector3(-10.0, 10.0, 10.0)
         
         let ambientLight = SCNLight()
         ambientLight.type = SCNLightTypeAmbient
@@ -161,25 +166,25 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         lightNode.light = light
         lightNode.position = SCNVector3(x: 1.5, y: 1.5, z: 1.5)
         
-        //object
-        let carScene : SCNScene = SCNScene(named: "gameAssets.scnassets/AudiCoupe.dae")!
-        
-        if let tempNode = carScene.rootNode.childNodeWithName("Car", recursively: true){
-            carNode = tempNode
-            carNode.position = SCNVector3(x: 0.0, y: 0.0, z: 0.0)
-            if carNode.geometry == nil {
-                carNode.geometry = SCNBox(width: 1.0, height: 1.0, length: 2.0, chamferRadius: 0.0)
-            }
-            let physicsShape = SCNPhysicsShape(geometry: carNode.geometry!, options: nil)
-            let physicsBody = SCNPhysicsBody(type: .Dynamic, shape: physicsShape)
-            carNode.physicsBody = physicsBody
-            
-            accelView.scene!.rootNode.addChildNode(carNode)
-            
-            //let axisNode = SCNNode()
-        }else {
-            print("Could not load car")
-        }
+//        //object
+//        let carScene : SCNScene = SCNScene(named: "gameAssets.scnassets/AudiCoupe.dae")!
+//        
+//        if let tempNode = carScene.rootNode.childNodeWithName("Car", recursively: true){
+//            carNode = tempNode
+//            carNode.position = SCNVector3(x: 0.0, y: 0.0, z: 0.0)
+//            if carNode.geometry == nil {
+//                carNode.geometry = SCNBox(width: 1.0, height: 1.0, length: 2.0, chamferRadius: 0.0)
+//            }
+//            let physicsShape = SCNPhysicsShape(geometry: carNode.geometry!, options: nil)
+//            let physicsBody = SCNPhysicsBody(type: .Dynamic, shape: physicsShape)
+//            carNode.physicsBody = physicsBody
+//            
+//            accelView.scene!.rootNode.addChildNode(carNode)
+//            
+//            //let axisNode = SCNNode()
+//        }else {
+//            print("Could not load car")
+//        }
         
         //add some placed boxes
         let box = SCNBox(width: 1.0, height: 1.0, length: 1.0, chamferRadius: 0.0)
@@ -194,8 +199,12 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         boxNode2 = boxNode
         boxNode2.position = SCNVector3(x: 1.0, y: 0.0, z: 1.0)
         
-        accelView.scene!.rootNode.addChildNode(boxNode)
-        accelView.scene!.rootNode.addChildNode(boxNode2)
+        //accelView.scene!.rootNode.addChildNode(boxNode)
+        //accelView.scene!.rootNode.addChildNode(boxNode2)
+        
+        //track
+        setupTrack()
+        setupPlayers()
         
         //ground
         let ground = SCNFloor()
@@ -211,12 +220,6 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         groundNode.position = SCNVector3(x: 0, y: -0.5, z: 0)
         previousOrientation = groundNode.orientation
         
-        //constraints
-        let constraint = SCNLookAtConstraint(target: carNode)
-        
-        cameraNode.constraints = [constraint]
-        lightNode.constraints = [constraint]
-        
         accelView.scene!.rootNode.addChildNode(cameraNode)
         accelView.scene!.rootNode.addChildNode(lightNode)
 
@@ -225,18 +228,124 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         
     }
     
-//    func rotatePlane(values : [Float]?) {
-//        if values != nil {
-//            
-//            let orientation = startorientation
-//            let quat = GLKQuaternionMultiply(GLKQuaternionMake(orientation.x, orientation.y, orientation.z, orientation.w), GLKQuaternionMake(values![0], values![1], values![2], values![3]))
-//            
-//            planeNode.orientation = SCNVector4Make(quat.x , quat.y, quat.z, quat.w)
-//            //planeNode.runAction(SCNAction.rotateToX(CGFloat(values![0]), y: CGFloat(values![1]), z: CGFloat(-values![2]), duration: 0.2))
-//        }else {
-//            write("Core motion data is nil")
-//        }
-//    }
+    func setupPlayers() {
+        //four 'players'
+        for (var i = 0; i < numberOfPlayers; i++) {
+            if let carScene : SCNScene = SCNScene(named: "gameAssets.scnassets/rc_car.dae") {
+                
+                if let chassisNode : SCNNode = carScene.rootNode.childNodeWithName("rccarBody", recursively: false) {
+                    
+                    chassisNode.position = SCNVector3Make(Float(i * 10), 10.0, 0)
+                    chassisNode.rotation = SCNVector4Make(0, 1, 0, Float(M_PI))
+                    
+                    
+                    if chassisNode.geometry?.materials != nil {
+                        chassisNode.geometry!.materials[0].diffuse.contents = setPlayerColours(i)
+                    }
+                    
+                    let body : SCNPhysicsBody = SCNPhysicsBody.dynamicBody()
+                    body.allowsResting = false
+                    body.mass = 80
+                    body.restitution = 0.1
+                    body.friction = 0.5
+                    body.rollingFriction = 0
+                    
+                    chassisNode.physicsBody = body
+                    accelView.scene!.rootNode.addChildNode(chassisNode)
+                    
+                    //wheels
+                    
+                    if let wheelNode1 : SCNNode = chassisNode.childNodeWithName("wheelLocator_FL", recursively: true) {
+                        if let wheelNode2 : SCNNode = chassisNode.childNodeWithName("wheelLocator_FR", recursively: true) {
+                            if let wheelNode3 : SCNNode = chassisNode.childNodeWithName("wheelLocator_RL", recursively: true) {
+                                if let wheelNode4 : SCNNode = chassisNode.childNodeWithName("wheelLocator_RR", recursively: true) {
+                                    
+                                    let wheel1 = SCNPhysicsVehicleWheel(node: wheelNode1)
+                                    let wheel2 = SCNPhysicsVehicleWheel(node: wheelNode2)
+                                    let wheel3 = SCNPhysicsVehicleWheel(node: wheelNode3)
+                                    let wheel4 = SCNPhysicsVehicleWheel(node: wheelNode4)
+                                    
+                                    var min = SCNVector3Zero
+                                    var max = SCNVector3Zero
+                                    
+                                    wheelNode1.getBoundingBoxMin(&min, max: &max)
+                                    let wheelHalfWidth : Float = (Float(0.5) * (max.x - min.x))
+                                    
+                                    wheel1.connectionPosition =
+                                        wheelNode1.convertPosition(SCNVector3Zero, toNode: chassisNode) + SCNVector3(wheelHalfWidth, 0.0, 0.0)
+                                    wheel2.connectionPosition =
+                                        wheelNode2.convertPosition(SCNVector3Zero, toNode: chassisNode) - SCNVector3(wheelHalfWidth, 0.0, 0.0)
+                                    wheel3.connectionPosition =
+                                        wheelNode3.convertPosition(SCNVector3Zero, toNode: chassisNode) + SCNVector3(wheelHalfWidth, 0.0, 0.0)
+                                    wheel4.connectionPosition =
+                                        wheelNode4.convertPosition(SCNVector3Zero, toNode: chassisNode) - SCNVector3(wheelHalfWidth, 0.0, 0.0)
+                                    
+                                    let vehicle = SCNPhysicsVehicle(chassisBody: chassisNode.physicsBody!, wheels: [wheel1, wheel2, wheel3, wheel4])
+                                    
+                                    accelView.scene?.physicsWorld.addBehavior(vehicle)
+                                    
+                                    self.vehicle = vehicle
+                                    
+                                    var gameobject = GameObject()
+                                    gameobject.sceneNode = chassisNode
+                                    gameobject.ID = i
+                                    gameobject.physicsVehicle = vehicle
+                                    
+                                    gameObjects.append(gameobject)
+                                    
+                                    //constraints
+                                    
+                                    let constraint = SCNLookAtConstraint(target: gameObjects[0].sceneNode)
+                                    
+                                    cameraNode.constraints = [constraint]
+                                    lightNode.constraints = [constraint]
+                                    
+                                }
+                            }
+                        }
+                    }
+                }
+     
+            }
+        }
+        
+    }
+    
+    func setupTrack() {
+        if let trackScene : SCNScene = SCNScene(named: "gameAssets.scnassets/BasicTrack.dae") {
+            if let tempNode  = trackScene.rootNode.childNodeWithName("BezierCircle", recursively: true) {
+                trackNode = tempNode
+                
+                trackNode.position = SCNVector3(x: 0.0, y: 0.0, z: 0.0)
+                //trackNode.scale = SCNVector3(5, 1, 5)
+                let geometry = trackNode.geometry
+                let shape = SCNPhysicsShape(geometry: geometry!, options: nil)
+                
+                let body = SCNPhysicsBody(type: .Kinematic, shape: shape)
+                
+                trackNode.physicsBody = body
+                
+                accelView.scene?.rootNode.addChildNode(trackNode)
+            }
+            
+            
+        }
+    }
+    
+    func setPlayerColours( i : Int) -> UIColor {
+        switch i {
+        case 0:
+            return UIColor.redColor()
+        case 1:
+            return UIColor.yellowColor()
+        case 2:
+            return UIColor.greenColor()
+        case 3:
+            return UIColor.blueColor()
+        default:
+            return UIColor.blackColor()
+        }
+    }
     
     @IBAction func button1Pressed() {
         sendButtonPressed("Button 1")
@@ -300,6 +409,20 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
     }
     func didReceiveMessage(message: [String : AnyObject], fromDevice: String, replyHandler: ([String : AnyObject]) -> Void) {
         self.didReceiveMessage(message, fromDevice: fromDevice)
+        var foundPlayerFromDevice = -1
+        //link device to player
+        for (var i = 0; i < gameObjects.count && foundPlayerFromDevice == -1; i++ ){
+            
+            if gameObjects[i].playerID == nil { //no device ID
+                gameObjects[i].playerID = fromDevice
+                foundPlayerFromDevice = i
+            } else if gameObjects[i].playerID == fromDevice {
+                foundPlayerFromDevice = i
+            }
+        }
+        
+        print("Device \(fromDevice) is attached to Player \(foundPlayerFromDevice)")
+        
         //detect which form of data is being sent over
         if message.keys.first == "Button" {
             
@@ -400,6 +523,13 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
     }
 }
 
+func +(l: SCNVector3, r:SCNVector3) -> SCNVector3 {
+    return SCNVector3(l.x + r.x, l.y + r.y, l.z + r.z)
+}
+
+func -(l: SCNVector3, r:SCNVector3) -> SCNVector3 {
+    return SCNVector3(l.x - r.x, l.y - r.y, l.z - r.z)
+}
 
 extension SCNQuaternion {
     
@@ -431,6 +561,8 @@ extension SCNVector3 {
     func magnitudeSquared() -> Float {
         return ((self.x * self.x) + (self.y * self.y) + (self.z + self.z))
     }
+    
+
 }
 
 extension GLKQuaternion {
