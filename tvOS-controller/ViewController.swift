@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 import SceneKit
 import GameController
+import GameplayKit
 
 class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDelegate  {
     
@@ -104,6 +105,9 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
     // Handle Game Controller Notifications
     func controllerDidConnect(controller:GCController) {
         controller.microGamepad?.valueChangedHandler = self.microGamePadHandler
+        
+        controller.microGamepad?.buttonA.valueChangedHandler = self.buttonAPressed
+        controller.microGamepad?.buttonX.valueChangedHandler = self.buttonXPressed
         
     }
     func controllerDidDisconnect(controller:GCController) {
@@ -211,7 +215,6 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         //camera
         let camera = SCNCamera()
         cameraNode.camera = camera
-        cameraNode.position = SCNVector3(-10.0, 5.0, 10.0)
         
         
         let ambientLight = SCNLight()
@@ -231,10 +234,57 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         self.chassis = configureCar()
         self.chassis?.position = SCNVector3(x: 0.0, y: 0.0, z: 0.0)
         
-        let cameraConstraint = SCNLookAtConstraint(target: self.chassis!)
-        cameraConstraint.gimbalLockEnabled = true
+        
+        // Place some random objects on the scene
+        
+        let rng = GKARC4RandomSource()
+        
+        let xy = GKRandomDistribution(randomSource: rng, lowestValue: -200, highestValue: 200)
+        let sz = GKRandomDistribution(randomSource: rng, lowestValue: 0, highestValue: 199)
+        let obj = GKRandomDistribution(randomSource: rng, lowestValue: 1, highestValue: 3)
+        
+        let colours = [UIColor.redColor(), UIColor.greenColor(), UIColor.blueColor(), UIColor.yellowColor(), UIColor.orangeColor()]
+        let colRNG = GKRandomDistribution(randomSource: rng, lowestValue: 0, highestValue: colours.count - 1)
+        
+        for _ in 0..<20 {
+            
+            var geometry:SCNGeometry
+            
+            switch obj.nextInt() {
+            case 1:
+                let size = CGFloat(sz.nextUniform()) * 30.0
+                geometry = SCNBox(width: size, height: size, length: size, chamferRadius: size * 0.2)
+            case 2:
+                let sizeA = CGFloat(sz.nextUniform()) * 15.0
+                let sizeB = CGFloat(sz.nextUniform()) * 5.0
+                geometry = SCNTorus(ringRadius: sizeA + sizeB, pipeRadius: sizeB)
+            case 3:
+                let sizeA = CGFloat(sz.nextUniform()) * 5.0
+                let sizeB = CGFloat(sz.nextUniform()) * 5.0
+                geometry = SCNCone(topRadius: 0.0, bottomRadius: sizeA, height: sizeA + sizeB)
+            default:
+                geometry = SCNSphere(radius: 3.0)
+                
+            }
+            
+            
+            let node = SCNNode(geometry: geometry)
+            
+            var min = SCNVector3Zero
+            var max = SCNVector3Zero
+            geometry.getBoundingBoxMin(&min, max: &max)
+            
+            geometry.firstMaterial?.diffuse.contents = colours[colRNG.nextInt()]
+            
+            node.position = SCNVector3(CGFloat(xy.nextUniform()) * 100.0, -CGFloat(min.y) * 2.0, CGFloat(xy.nextUniform()) * 100.0)
+            node.physicsBody = SCNPhysicsBody(type: .Dynamic, shape: SCNPhysicsShape(geometry: geometry, options: nil))
+            
+            node.physicsBody?.mass = 10.0
+            accelView.scene!.rootNode.addChildNode(node)
 
-        cameraNode.constraints = [cameraConstraint]
+            
+        }
+        
         
         
         //add some placed boxes
@@ -257,7 +307,16 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         let ground = SCNFloor()
         ground.reflectivity = 0.5
         let groundMaterial = SCNMaterial()
-        groundMaterial.diffuse.contents = UIColor.blueColor()
+        groundMaterial.diffuse.contents = "Tile"
+        groundMaterial.diffuse.contentsTransform = SCNMatrix4MakeScale(10.0, 10.0, 10.0)
+        groundMaterial.diffuse.wrapS = .Repeat
+        groundMaterial.diffuse.wrapT = .Repeat
+        groundMaterial.diffuse.minificationFilter = .Linear
+        groundMaterial.diffuse.mipFilter = .Linear
+        //groundMaterial.diffuse.magnificationFilter = .Linear
+        groundMaterial.diffuse.maxAnisotropy = 8.0
+        
+        
         let physicsShape = SCNPhysicsShape(geometry: SCNFloor(), options: nil)
         let body = SCNPhysicsBody(type: .Static, shape: physicsShape)
         ground.materials = [groundMaterial]
@@ -268,11 +327,16 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         previousOrientation = groundNode.orientation
         
         //constraints
-        let constraint = SCNLookAtConstraint(target: carNode)
+        lightNode.constraints = [SCNLookAtConstraint(target: carNode)]
         
-        lightNode.constraints = [constraint]
         
-        accelView.scene!.rootNode.addChildNode(cameraNode)
+        let cameraConstraint = SCNLookAtConstraint(target: self.chassis!)
+        cameraConstraint.gimbalLockEnabled = true
+
+        cameraNode.constraints = [cameraConstraint]
+        cameraNode.position = SCNVector3(0.5, 10.0, -20.0)
+        self.chassis!.addChildNode(cameraNode)
+        
         accelView.scene!.rootNode.addChildNode(lightNode)
 
         accelView.scene!.rootNode.addChildNode(groundNode)
@@ -345,16 +409,22 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
             
             self.steer(-directionPad.xAxis.value * 0.6)
             
-            if directionPad.yAxis.value > 0.0 {
-                self.accelerate(directionPad.yAxis.value * 500.0 )
-            }
-            else {
-                self.brake(directionPad.yAxis.value * -5.0 )
-            }
+
         }
-        
-        
     }
+    func buttonAPressed(button:GCControllerButtonInput, value:Float, pressed:Bool) {
+        if pressed {
+            self.accelerate(CGFloat(value) * 1500.0)
+        }
+        else {
+            self.accelerate(CGFloat(0.0))
+        }
+    }
+    func buttonXPressed(button:GCControllerButtonInput, value:Float, pressed:Bool) {
+        self.brake( CGFloat(value) * 5.0 )
+    }
+
+    
     
     // MARK: Car Controls
     @nonobjc
