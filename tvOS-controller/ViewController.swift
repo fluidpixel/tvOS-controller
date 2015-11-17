@@ -251,7 +251,7 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         
         let colRNG = GKRandomDistribution(randomSource: rng, lowestValue: 0, highestValue: colours.count - 1)
         
-        for _ in 0..<20 {
+        for _ in 0..<30 {
             
             var geometry:SCNGeometry
             var physics:SCNPhysicsBody
@@ -298,7 +298,7 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
 
             geometry.firstMaterial?.doubleSided = true
             
-            node.position = SCNVector3(CGFloat(xy.nextUniform()) * 100.0, -CGFloat(min.y) * 2.0, CGFloat(xy.nextUniform()) * 100.0)
+            node.position = SCNVector3(CGFloat(xy.nextUniform()) * 150.0, -CGFloat(min.y) * 2.0, CGFloat(xy.nextUniform()) * 150.0)
             node.physicsBody = physics
             
             node.physicsBody?.mass = 20.0
