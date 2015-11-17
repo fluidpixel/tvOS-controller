@@ -15,60 +15,30 @@ import GameplayKit
 class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDelegate  {
     
     @IBOutlet var messageArea: UILabel!
-    
     @IBOutlet var button1: UIButton!
     @IBOutlet var button2: UIButton!
-    
     @IBOutlet var button3: UIButton!
+    @IBOutlet weak var DrawCanvas : UIImageView!
+    @IBOutlet weak var messageView: UITextView!
+    
     
     @IBOutlet weak var accelView: SCNView!
+    @IBOutlet var speed: UILabel!
     
-    @IBOutlet weak var messageView: UITextView!
     let remote = TVCTVSession()
     
-    @IBOutlet weak var DrawCanvas : UIImageView!
-    
-    @IBOutlet var speed: UILabel!
     var prevSpeed:Int = 0
-    
-    var gameObjects = [GameObject]()
-    var timer = NSTimer()
-
-    var vectorToMoveBy = SCNVector3(0, 0, 1)
-    var firstRun = true
-    var initialTime = 0.0
-    //testing
-    let angle = sin(M_PI_4 / 2.0)
     
     //scene nodes
     let cameraNode = SCNNode()
     let lightNode = SCNNode()
     var groundNode = SCNNode()
-    var carNode = SCNNode()
-    //boxes
-    var boxNode = SCNNode()
-    var boxNode2 = SCNNode()
+
     
     //update variables
-    //var accel : Float = 0.0
-    //var speed : Float = 0.0
-    var previousOrientation = SCNQuaternion()
-    //var glkRepresentation = GLKQuaternion()
-    var slerp = 0.0
-    var isSlerping = false
-    
-    //y, p, r variables
-    var intialYPR : [Float] = [0.0,0.0,0.0]
-    var currentYPR : [Float] = [0.0,0.0,0.0]
-    
-    // draw
-    var lastPoint = CGPoint.zero
-    
-    
     var acceleration:CGFloat = 0.0
     var brake:CGFloat = 0.0
-    
-    
+
     var notes:[AnyObject] = []
     
     override func viewDidLoad() {
@@ -95,7 +65,13 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
                 }
         }))
     }
-    
+    deinit {
+        print("DEINIT")
+        for note in notes {
+            NSNotificationCenter.defaultCenter().removeObserver(note)
+        }
+        notes.removeAll()
+    }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -120,6 +96,9 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         //called first, any pre-render game logic here
     }
     
+    
+    var ticks = 0
+    var check = 0
     func renderer(renderer: SCNSceneRenderer, didSimulatePhysicsAtTime time: NSTimeInterval) {
 
         self.vehicle?.applyEngineForce(self.acceleration, forWheelAtIndex: 2)
@@ -135,6 +114,23 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
             prevSpeed = intSpeed
         }
         
+        if let car = self.chassis?.presentationNode {
+            if ++ticks == 30 {
+                if car.worldTransform.m22 <= 0.1 {
+                    if ++check >= 3 {
+                        //self.chassis?.position = SCNVector3(0.0, 0.0, 0.0)
+                        
+                        self.chassis?.rotation = SCNVector4(0.0, 0.0, 0.0, 0.0)
+                        self.chassis?.physicsBody?.resetTransform()
+                        check = 0
+                    }
+                }
+                else {
+                    check = 0
+                }
+                ticks = 0
+            }
+        }
     }
     
 
@@ -214,8 +210,8 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         //accelView.scene!.physicsWorld.gravity = SCNVector3(x: 0.0, y: 0.0, z: 0.0)
         //camera
         let camera = SCNCamera()
+        camera.zFar = 1000.0
         cameraNode.camera = camera
-        
         
         let ambientLight = SCNLight()
         ambientLight.type = SCNLightTypeAmbient
@@ -241,30 +237,38 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         
         let xy = GKRandomDistribution(randomSource: rng, lowestValue: -200, highestValue: 200)
         let sz = GKRandomDistribution(randomSource: rng, lowestValue: 0, highestValue: 199)
-        let obj = GKRandomDistribution(randomSource: rng, lowestValue: 1, highestValue: 3)
+        let obj = GKRandomDistribution(randomSource: rng, lowestValue: 1, highestValue: 4)
         
-        let colours = [UIColor.redColor(), UIColor.greenColor(), UIColor.blueColor(), UIColor.yellowColor(), UIColor.orangeColor()]
+        let colours = [UIColor.redColor(), UIColor.greenColor(), UIColor.blueColor(), UIColor.yellowColor(), UIColor.orangeColor(), UIColor.magentaColor(), UIColor.cyanColor()]
+        
         let colRNG = GKRandomDistribution(randomSource: rng, lowestValue: 0, highestValue: colours.count - 1)
         
         for _ in 0..<20 {
             
             var geometry:SCNGeometry
+            var physics:SCNPhysicsShape
             
             switch obj.nextInt() {
             case 1:
-                let size = CGFloat(sz.nextUniform()) * 30.0
+                let size = CGFloat(sz.nextUniform()) * 20.0 + 5.0
                 geometry = SCNBox(width: size, height: size, length: size, chamferRadius: size * 0.2)
+                physics = SCNPhysicsShape(geometry: geometry, options: nil)
             case 2:
                 let sizeA = CGFloat(sz.nextUniform()) * 15.0
                 let sizeB = CGFloat(sz.nextUniform()) * 5.0
                 geometry = SCNTorus(ringRadius: sizeA + sizeB, pipeRadius: sizeB)
+                physics = SCNPhysicsShape(geometry: geometry, options: nil)
             case 3:
                 let sizeA = CGFloat(sz.nextUniform()) * 5.0
                 let sizeB = CGFloat(sz.nextUniform()) * 5.0
-                geometry = SCNCone(topRadius: 0.0, bottomRadius: sizeA, height: sizeA + sizeB)
+                geometry = SCNCone(topRadius: 0.0, bottomRadius: sizeA + 5.0, height: sizeA + sizeB + 5.0)
+                physics = SCNPhysicsShape(geometry: geometry, options: nil)
+            case 4:
+                geometry = SCNCapsule(capRadius: CGFloat(sz.nextUniform()) * 15.0 + 5.0, height: CGFloat(sz.nextUniform()) * 15.0 + 5.0)
+                physics = SCNPhysicsShape(geometry: geometry, options: nil)
             default:
                 geometry = SCNSphere(radius: 3.0)
-                
+                physics = SCNPhysicsShape(geometry: geometry, options: nil)
             }
             
             
@@ -273,35 +277,19 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
             var min = SCNVector3Zero
             var max = SCNVector3Zero
             geometry.getBoundingBoxMin(&min, max: &max)
-            
             geometry.firstMaterial?.diffuse.contents = colours[colRNG.nextInt()]
+            geometry.firstMaterial?.transparency = 0.7
+            geometry.firstMaterial?.doubleSided = true
             
             node.position = SCNVector3(CGFloat(xy.nextUniform()) * 100.0, -CGFloat(min.y) * 2.0, CGFloat(xy.nextUniform()) * 100.0)
-            node.physicsBody = SCNPhysicsBody(type: .Dynamic, shape: SCNPhysicsShape(geometry: geometry, options: nil))
+            node.physicsBody = SCNPhysicsBody(type: .Dynamic, shape: physics)
             
-            node.physicsBody?.mass = 10.0
+            node.physicsBody?.mass = 20.0
             accelView.scene!.rootNode.addChildNode(node)
 
             
         }
         
-        
-        
-        //add some placed boxes
-        let box = SCNBox(width: 1.0, height: 1.0, length: 1.0, chamferRadius: 0.0)
-        let boxMaterial = SCNMaterial()
-        boxMaterial.diffuse.contents = UIColor.redColor()
-        box.materials = [boxMaterial]
-        boxNode.position = SCNVector3(x: 5.0, y: 0.0, z: 5.0)
-        let physicsBox = SCNPhysicsShape(geometry: box, options: nil)
-        let boxBody = SCNPhysicsBody(type: .Static, shape: physicsBox)
-        boxNode = SCNNode(geometry: box)
-        boxNode.physicsBody = boxBody
-        boxNode2 = boxNode
-        boxNode2.position = SCNVector3(x: 1.0, y: 0.0, z: 1.0)
-        
-        accelView.scene!.rootNode.addChildNode(boxNode)
-        accelView.scene!.rootNode.addChildNode(boxNode2)
         
         //ground
         let ground = SCNFloor()
@@ -313,10 +301,7 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         groundMaterial.diffuse.wrapT = .Repeat
         groundMaterial.diffuse.minificationFilter = .Linear
         groundMaterial.diffuse.mipFilter = .Linear
-        //groundMaterial.diffuse.magnificationFilter = .Linear
         groundMaterial.diffuse.maxAnisotropy = 8.0
-        
-        
         let physicsShape = SCNPhysicsShape(geometry: SCNFloor(), options: nil)
         let body = SCNPhysicsBody(type: .Static, shape: physicsShape)
         ground.materials = [groundMaterial]
@@ -324,10 +309,8 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         groundNode.physicsBody = body
         
         groundNode.position = SCNVector3(x: 0, y: -0.5, z: 0)
-        previousOrientation = groundNode.orientation
         
-        //constraints
-        lightNode.constraints = [SCNLookAtConstraint(target: carNode)]
+        
         
         
         let cameraConstraint = SCNLookAtConstraint(target: self.chassis!)
@@ -335,12 +318,14 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
 
         cameraNode.constraints = [cameraConstraint]
         cameraNode.position = SCNVector3(0.5, 10.0, -20.0)
+        
         self.chassis!.addChildNode(cameraNode)
         
         accelView.scene!.rootNode.addChildNode(lightNode)
 
         accelView.scene!.rootNode.addChildNode(groundNode)
         
+        accelView.showsStatistics = true
         
     }
     
@@ -461,7 +446,7 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
     }
     
     func didReceiveMessage(message: [String : AnyObject], fromDevice: String) {
-        self.write("Message received: \(message) from: \(fromDevice)")
+        print("Unknown message received from: \(fromDevice)\n\(message)\n")
     }
     func didReceiveMessage(message: [String : AnyObject], fromDevice: String, replyHandler: ([String : AnyObject]) -> Void) {
         
@@ -492,42 +477,7 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         
         
         self.didReceiveMessage(message, fromDevice: fromDevice)
-        //detect which form of data is being sent over
-        if message.keys.first == "Button" {
-            
-            switch message.values.first! as! Int {
-            case 1:
-                button1Pressed()
-                break
-            case 2:
-                button2Pressed()
-                break
-            case 3:
-                button3Pressed()
-                break
-            default:
-                break
-            }
-            
-        }
-        else if message.keys.first == "DrawBegin" {
-            
-            let temp = message.values.first as! [Float]
-            lastPoint = CGPoint(x: CGFloat(temp[0]), y: CGFloat(temp[1]))
-            
-        }
-        else if message.keys.first == "DrawMove" {
-            
-            let temp = message.values.first as! [Float]
-            let currentPoint = CGPoint(x: CGFloat(temp[0]), y: CGFloat(temp[1]))
-            
-            drawLineFrom(lastPoint, toPoint: currentPoint)
-            lastPoint = currentPoint
-        }
-        else if message.keys.first == "DrawEnd" {
-            
-            drawLineFrom(lastPoint, toPoint: lastPoint)
-        }
+
         replyHandler(["Reply": speed])
         
     }
@@ -539,8 +489,5 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
     func deviceDidDisconnect(device: String) {
         self.write("Disconnected: \(device)")
     }
-    
-    private func OnTimerFired(accelerating : Bool) {
-        
-    }
+
 }
