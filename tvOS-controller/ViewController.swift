@@ -34,7 +34,6 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
     let lightNode = SCNNode()
     var groundNode = SCNNode()
 
-    
     //update variables
     var acceleration:CGFloat = 0.0
     var brake:CGFloat = 0.0
@@ -215,17 +214,15 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         
         let ambientLight = SCNLight()
         ambientLight.type = SCNLightTypeAmbient
-        ambientLight.color = UIColor(red: 0.5, green: 0.5, blue: 0.0, alpha: 1.0)
+        ambientLight.color = UIColor(red: 0.25, green: 0.25, blue: 0.35, alpha: 1.0)
         cameraNode.light = ambientLight
-        
-        //light
+
         
         let light = SCNLight()
         light.type = SCNLightTypeDirectional
         light.castsShadow = true
         
         lightNode.light = light
-        lightNode.position = SCNVector3(x: 1.5, y: 1.5, z: 1.5)
         
         self.chassis = configureCar()
         self.chassis?.position = SCNVector3(x: 0.0, y: 0.0, z: 0.0)
@@ -321,7 +318,16 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         
         self.chassis!.addChildNode(cameraNode)
         
-        accelView.scene!.rootNode.addChildNode(lightNode)
+        let lightConstraint = SCNLookAtConstraint(target: self.chassis!)
+        
+        lightConstraint.gimbalLockEnabled = true
+        lightNode.constraints = [lightConstraint]
+        lightNode.position = SCNVector3(0.5, 10.0, -20.0)
+        
+        
+        self.chassis!.addChildNode(lightNode)
+        
+        //accelView.scene!.rootNode.addChildNode(lightNode)
 
         accelView.scene!.rootNode.addChildNode(groundNode)
         
@@ -330,62 +336,9 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
     }
     
     
-    @IBAction func button1Pressed() {
-        sendButtonPressed("Button 1")
-        DrawCanvas.hidden = true
-       // messageView.hidden = false
-    }
-    
-    @IBAction func button2Pressed() {
-        sendButtonPressed("Button 2")
-        DrawCanvas.hidden = false
-        messageView.hidden = true
-    }
-    @IBAction func button3Pressed() {
-        sendButtonPressed("Button 3")
-    }
-    
-    private func sendButtonPressed(buttonText:String) {
-        self.write(buttonText)
-        remote.broadcastMessage(["ButtonPressed":buttonText], replyHandler: {
-            (deviceID:String, reply:[String : AnyObject]) -> Void in
-            
-            self.write("Reply from \(deviceID) - \(reply)")
-            
-            }) {
-                (error) -> Void in
-                self.write("Error \(error)")
-        }
-    }
-    
-    private func write(line:String) {
-        dispatch_async(dispatch_get_main_queue()) {
-            let existingText = self.messageView.text!
-            self.messageView.text = "\(existingText)\n\(line)"
-        }
-    }
-    
-    func drawLineFrom(fromPoint: CGPoint, toPoint: CGPoint) {
-        
-        UIGraphicsBeginImageContext(DrawCanvas.frame.size)
-        let context = UIGraphicsGetCurrentContext()
-        DrawCanvas.image?.drawInRect(CGRect(x : 0 , y: 0, width: DrawCanvas.frame.size.width, height: DrawCanvas.frame.size.height))
-        
-        CGContextMoveToPoint(context, fromPoint.x, fromPoint.y)
-        CGContextAddLineToPoint(context, toPoint.x, toPoint.y)
-        
-        CGContextSetLineCap(context, CGLineCap.Round)
-        CGContextSetLineWidth(context, 5.0)
-        CGContextSetRGBStrokeColor(context, 0.0, 0.0, 0.0, 1.0)
-        CGContextSetBlendMode(context, CGBlendMode.Normal)
-        
-        CGContextStrokePath(context)
-        
-        DrawCanvas.image = UIGraphicsGetImageFromCurrentImageContext()
-        DrawCanvas.alpha = 1.0
-        UIGraphicsEndImageContext()
-        
-    }
+    @IBAction func button1Pressed() {}
+    @IBAction func button2Pressed() {}
+    @IBAction func button3Pressed() {}
     
     func microGamePadHandler(mgp:GCMicroGamepad, element:GCControllerElement) -> Void {
         print("\(mgp.controller?.playerIndex): \(element)")
@@ -454,7 +407,7 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
             
             
             if accel > 0.0 {
-                self.accelerate(accel * 200.0)
+                self.accelerate(accel * 1500.0)
             }
             else if accel < 0.0 {
                 self.brake( -accel * 5.0)
@@ -484,10 +437,10 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
     
     
     func deviceDidConnect(device: String) {
-        self.write("Connected: \(device)")
+        print("Connected: \(device)")
     }
     func deviceDidDisconnect(device: String) {
-        self.write("Disconnected: \(device)")
+        print("Disconnected: \(device)")
     }
 
 }
