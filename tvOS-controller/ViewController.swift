@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 import SceneKit
+import GameController
 
 class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDelegate  {
     
@@ -66,6 +67,9 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
     var acceleration:CGFloat = 0.0
     var brake:CGFloat = 0.0
     
+    
+    var notes:[AnyObject] = []
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -74,13 +78,39 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         // Do any additional setup after loading the view, typically from a nib.
         prepareScene()
         accelView.play(nil)
+        
+        notes.append(NSNotificationCenter.defaultCenter().addObserverForName(GCControllerDidConnectNotification, object: nil, queue: nil,
+            usingBlock: {
+            [weak self] (note) -> Void in
+                if let newController = note.object as? GCController {
+                    self?.controllerDidConnect(newController)
+                }
+        }))
+        notes.append(NSNotificationCenter.defaultCenter().addObserverForName(GCControllerDidDisconnectNotification, object: nil, queue: nil,
+            usingBlock: {
+                [weak self] (note) -> Void in
+                if let oldController = note.object as? GCController {
+                    self?.controllerDidDisconnect(oldController)
+                }
+        }))
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
+    
+    // Handle Game Controller Notifications
+    func controllerDidConnect(controller:GCController) {
+        controller.microGamepad?.valueChangedHandler = self.microGamePadHandler
+        
+    }
+    func controllerDidDisconnect(controller:GCController) {
+    }
+    
+    
+    // MARK: SCNSceneRendererDelegate
     func renderer(renderer: SCNSceneRenderer, updateAtTime time: NSTimeInterval) {
         
         //called first, any pre-render game logic here
@@ -103,50 +133,7 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         
     }
     
-//    func updateCar(delta: NSTimeInterval) {
-//        
-//        //move car in the direction it is currently facing
-//
-//        carNode.runAction(SCNAction.moveByX(CGFloat(vectorToMoveBy.x * Float(delta) * (accel)), y: 0.0, z: CGFloat(vectorToMoveBy.z * Float(delta) * (accel)), duration: delta))
-//        speed = vectorToMoveBy.magnitudeSquared()
-//        cameraNode.position = SCNVector3(carNode.position.x + 10, carNode.position.y + 10, carNode.position.z)
-////        if isSlerping {
-////            slerp += delta
-////            
-////            var slerpAmount = slerp / 1.0
-////            
-////            if slerpAmount > 1.0 {
-////                slerpAmount = 1.0
-////                isSlerping = false
-////            }
-////            
-//           // let tempGLK = GLKQuaternionMake(carNode.orientation.x, carNode.orientation.y, carNode.orientation.z, carNode.orientation.w)
-//            
-//           // let result = GLKQuaternionSlerp(tempGLK, glkRepresentation, Float(slerpAmount))
-//            
-//            //carNode.orientation.y = result.y
-//            
-//            //let angle = tempGLK.AngleFromQuaternion(result)
-//        
-//            let angle = (currentYPR[0]) //pitch
-//            
-//            carNode.runAction((SCNAction.rotateByAngle(CGFloat(angle * Float(delta)), aroundAxis: SCNVector3(0, 1, 0), duration: delta)), completionHandler: { () -> Void in
-//                self.intialYPR = self.currentYPR
-//            })
-//            
-//            let matrix = SCNMatrix4MakeRotation((angle  * Float(delta)), 0, 1, 0)
-//            
-//            vectorToMoveBy = vectorToMoveBy.multiplyByMatrix4(matrix)
-//        
-//           // intialYPR = [carNode.eulerAngles.x, carNode.eulerAngles.y, carNode.eulerAngles.z]
-//
-//            //let temp = GLKQuaternionRotateVector3(result, GLKVector3(v: (vectorToMoveBy.x, vectorToMoveBy.y, vectorToMoveBy.z)))
-//            //vectorToMoveBy = SCNVector3(temp.x, temp.y, temp.z)
-//            
-//       // }
-//    }
-//    
-//    
+
     
     
     var vehicle:SCNPhysicsVehicle?
@@ -226,6 +213,7 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         cameraNode.camera = camera
         cameraNode.position = SCNVector3(-10.0, 5.0, 10.0)
         
+        
         let ambientLight = SCNLight()
         ambientLight.type = SCNLightTypeAmbient
         ambientLight.color = UIColor(red: 0.5, green: 0.5, blue: 0.0, alpha: 1.0)
@@ -267,7 +255,7 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         
         //ground
         let ground = SCNFloor()
-        ground.reflectivity = 0
+        ground.reflectivity = 0.5
         let groundMaterial = SCNMaterial()
         groundMaterial.diffuse.contents = UIColor.blueColor()
         let physicsShape = SCNPhysicsShape(geometry: SCNFloor(), options: nil)
@@ -292,18 +280,6 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         
     }
     
-//    func rotatePlane(values : [Float]?) {
-//        if values != nil {
-//            
-//            let orientation = startorientation
-//            let quat = GLKQuaternionMultiply(GLKQuaternionMake(orientation.x, orientation.y, orientation.z, orientation.w), GLKQuaternionMake(values![0], values![1], values![2], values![3]))
-//            
-//            planeNode.orientation = SCNVector4Make(quat.x , quat.y, quat.z, quat.w)
-//            //planeNode.runAction(SCNAction.rotateToX(CGFloat(values![0]), y: CGFloat(values![1]), z: CGFloat(-values![2]), duration: 0.2))
-//        }else {
-//            write("Core motion data is nil")
-//        }
-//    }
     
     @IBAction func button1Pressed() {
         sendButtonPressed("Button 1")
@@ -362,6 +338,58 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         
     }
     
+    func microGamePadHandler(mgp:GCMicroGamepad, element:GCControllerElement) -> Void {
+        print("\(mgp.controller?.playerIndex): \(element)")
+        
+        if let directionPad = element as? GCControllerDirectionPad {
+            
+            self.steer(-directionPad.xAxis.value * 0.6)
+            
+            if directionPad.yAxis.value > 0.0 {
+                self.accelerate(directionPad.yAxis.value * 500.0 )
+            }
+            else {
+                self.brake(directionPad.yAxis.value * -5.0 )
+            }
+        }
+        
+        
+    }
+    
+    // MARK: Car Controls
+    @nonobjc
+    func accelerate(amount:Float) {
+        self.acceleration = CGFloat(amount)
+    }
+    @nonobjc
+    func brake(amount:Float) {
+        self.acceleration = 0.0
+        self.brake = CGFloat(amount)
+    }
+    
+    @nonobjc
+    func steer(amount:Float) {
+        let steer = CGFloat(amount)
+        self.vehicle?.setSteeringAngle(steer, forWheelAtIndex: 0)
+        self.vehicle?.setSteeringAngle(steer, forWheelAtIndex: 1)
+    }
+    
+    @nonobjc
+    func accelerate(amount:CGFloat) {
+        self.acceleration = amount
+    }
+    @nonobjc
+    func brake(amount:CGFloat) {
+        self.acceleration = 0.0
+        self.brake = amount
+    }
+    
+    @nonobjc
+    func steer(steer:CGFloat) {
+        self.vehicle?.setSteeringAngle(steer, forWheelAtIndex: 0)
+        self.vehicle?.setSteeringAngle(steer, forWheelAtIndex: 1)
+    }
+    
     func didReceiveMessage(message: [String : AnyObject], fromDevice: String) {
         self.write("Message received: \(message) from: \(fromDevice)")
     }
@@ -371,94 +399,24 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
             
             
             if accel > 0.0 {
-                self.acceleration = accel * 200.0
-                
+                self.accelerate(accel * 200.0)
             }
             else if accel < 0.0 {
-                self.acceleration = 0.0
-                self.brake = -accel * 5.0
+                self.brake( -accel * 5.0)
             }
             else {
-                self.acceleration = 0.0
-                self.brake = 0.0
-                
+                self.brake(CGFloat(0.0))
             }
             
-            
-            print(accel)
-            
-            replyHandler(["Reply": accel])
+            replyHandler(["Speed": accel])
             
             return
             
         }
         if let steer = message["Steering"] as? CGFloat {
-            replyHandler(["STEER": steer])
-            self.vehicle?.setSteeringAngle(steer, forWheelAtIndex: 0)
-            self.vehicle?.setSteeringAngle(steer, forWheelAtIndex: 1)
-            
+            replyHandler(["Steering": steer])
+            self.steer(steer)
             return
-        }
-        
-        
-        if let quatData = message["Accelerometer"] as? [CGFloat] where quatData.count == 4 {
-//            let quat = SCNQuaternion(quatData[0], quatData[1], quatData[2], quatData[3])
-//            
-//            print (quat)
-//            
-//            let tempValue = message.values.first as! [Float]
-//            
-//            //check for change first
-//            
-//            //quaternions
-//            if tempValue.count == 4 {
-//                
-//                if (abs(previousOrientation.x - tempValue[0]) > 0.01 || abs(previousOrientation.y - tempValue[1]) > 0.01 || abs(previousOrientation.z - tempValue[2]) > 0.01) && !previousOrientation.isZero() {
-//                    
-//                    glkRepresentation = GLKQuaternionMake(tempValue[0], tempValue[1], tempValue[2], tempValue[3])
-//                    print("rotate by  \(tempValue)")
-//                    previousOrientation = SCNVector4(x: tempValue[0], y: tempValue[1], z: tempValue[2], w: tempValue[3])
-//                    isSlerping = true
-//                    
-//                }else if previousOrientation.isZero() {
-//                    
-//                    previousOrientation = SCNVector4(x: tempValue[0], y: tempValue[1], z: tempValue[2], w: tempValue[3])
-//                }
-//            }
-//            
-//
-//            replyHandler(["Reply": speed])
-//            
-//            return
-        }
-        else if let ypr = message["Accelerometer"] as? [Float] where ypr.count == 3 {
-            
-//            //yaw/pitch/roll
-//            let dYPR0 = abs(intialYPR[0] - ypr[0])
-//            let dYPR1 = abs(intialYPR[1] - ypr[1])
-//            let dYPR2 = abs(intialYPR[2] - ypr[2])
-//            
-//                if (dYPR0 > 0.01 || dYPR1 > 0.01 || dYPR2 > 0.01) && intialYPR != [0.0, 0.0,0.0] {
-//                    
-//                    print("pitch : \(ypr[0]), yaw: \(ypr[1]), roll: \(ypr[2])")
-//                    
-//                    currentYPR = ypr
-//                    
-//                } else if intialYPR == [0.0, 0.0,0.0]{
-//                    intialYPR = ypr
-//                    currentYPR = ypr
-//                }
-//                
-//                self.vehicle?.setSteeringAngle(CGFloat(ypr[0]) * 180.0 / CG_PI, forWheelAtIndex: 0)
-//                self.vehicle?.setSteeringAngle(CGFloat(ypr[0]) * 180.0 / CG_PI, forWheelAtIndex: 1)
-////                self.vehicle?.setSteeringAngle(CGFloat(currentYPR[0]) * 180.0 / CG_PI, forWheelAtIndex: 2)
-////                self.vehicle?.setSteeringAngle(CGFloat(currentYPR[0]) * 180.0 / CG_PI, forWheelAtIndex: 3)
-//            
-//            replyHandler(["Reply": speed])
-//            
-//            return
-//            
-            
         }
         
         
@@ -516,64 +474,3 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         
     }
 }
-
-
-extension SCNQuaternion {
-    
-    /**
-     Checks for empty/all zero quaternions
-     
-     - Returns: returns true if Quaternion is all zero
-     */
-    func isZero() -> Bool {
-        if self.x == 0.0 && self.y == 0.0 && self.z == 0.0 && self.w == 0.0 {
-            return true
-        } else {
-            return false
-        }
-    }
-    
-}
-
-extension SCNVector3 {
-    
-    func multiplyByMatrix4(mat4: SCNMatrix4) -> SCNVector3 {
-        
-        return SCNVector3(
-            self.x * mat4.m11 + self.y * mat4.m21 + self.z * mat4.m31,
-            self.x * mat4.m12 + self.y * mat4.m22 + self.z * mat4.m32,
-            self.x * mat4.m13 + self.y * mat4.m23 + self.z * mat4.m33)
-    }
-    
-    func magnitudeSquared() -> Float {
-        return ((self.x * self.x) + (self.y * self.y) + (self.z + self.z))
-    }
-}
-
-extension GLKQuaternion {
-    
-    
-    /**
-     Finds the angle between two quaternions
-     
-     - Returns: returns the angle in radians
-     
-     */
-    func AngleFromQuaternion(quat : GLKQuaternion) -> Float {
-        let inv = GLKQuaternionInvert(self)
-        
-        let result = GLKQuaternionMultiply(quat, inv)
-        
-        let angle = acosf(result.w) * 2.0
-    
-        if angle > Float(M_PI_2) {
-            
-            return (Float(M_PI) - angle)
-        } else {
-            return angle
-        }
-        
-    }
-}
-
-

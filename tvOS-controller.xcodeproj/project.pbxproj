@@ -18,6 +18,7 @@
 		2703A0921BE7876A00397389 /* SharedKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2703A08B1BE7876A00397389 /* SharedKeys.swift */; };
 		2703A0941BE7876A00397389 /* TVCPhoneSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2703A08C1BE7876A00397389 /* TVCPhoneSession.swift */; };
 		2703A0951BE7876A00397389 /* TVCTVSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2703A08D1BE7876A00397389 /* TVCTVSession.swift */; };
+		274952821BFB2DBF0068C8A1 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 274952811BFB2DBF0068C8A1 /* Extensions.swift */; };
 		27BFD3161BE7868C00AB28D5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BFD3151BE7868C00AB28D5 /* AppDelegate.swift */; };
 		27BFD3181BE7868C00AB28D5 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BFD3171BE7868C00AB28D5 /* ViewController.swift */; };
 		27BFD31B1BE7868C00AB28D5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 27BFD3191BE7868C00AB28D5 /* Main.storyboard */; };
@@ -46,6 +47,7 @@
 		2703A08B1BE7876A00397389 /* SharedKeys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SharedKeys.swift; sourceTree = "<group>"; };
 		2703A08C1BE7876A00397389 /* TVCPhoneSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TVCPhoneSession.swift; sourceTree = "<group>"; };
 		2703A08D1BE7876A00397389 /* TVCTVSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TVCTVSession.swift; sourceTree = "<group>"; };
+		274952811BFB2DBF0068C8A1 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		27BFD3121BE7868C00AB28D5 /* tvOS-controller.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "tvOS-controller.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		27BFD3151BE7868C00AB28D5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		27BFD3171BE7868C00AB28D5 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -141,6 +143,7 @@
 			children = (
 				27BFD3151BE7868C00AB28D5 /* AppDelegate.swift */,
 				27BFD3171BE7868C00AB28D5 /* ViewController.swift */,
+				274952811BFB2DBF0068C8A1 /* Extensions.swift */,
 				27BFD3191BE7868C00AB28D5 /* Main.storyboard */,
 				27C45BD91BF503EE00163127 /* CarNode.swift */,
 				27BFD31C1BE7868C00AB28D5 /* Assets.xcassets */,
@@ -269,6 +272,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B941242B1BECC70A0077B71E /* GameScene.swift in Sources */,
+				274952821BFB2DBF0068C8A1 /* Extensions.swift in Sources */,
 				B90B246E1BF4C7A8005B3631 /* PhysicsComponent.swift in Sources */,
 				2703A0951BE7876A00397389 /* TVCTVSession.swift in Sources */,
 				2703A08F1BE7876A00397389 /* GCDAsyncSocket.m in Sources */,
