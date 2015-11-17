@@ -280,8 +280,16 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
             var min = SCNVector3Zero
             var max = SCNVector3Zero
             geometry.getBoundingBoxMin(&min, max: &max)
-            geometry.firstMaterial?.diffuse.contents = colours[colRNG.nextInt()]
-            //geometry.firstMaterial?.transparency = 1.0
+            geometry.firstMaterial?.diffuse.contents = "Tile"
+            geometry.firstMaterial?.diffuse.contentsTransform
+            geometry.firstMaterial?.diffuse.contentsTransform = SCNMatrix4MakeScale(20.0, 20.0, 20.0)
+            geometry.firstMaterial?.diffuse.wrapS = .Repeat
+            geometry.firstMaterial?.diffuse.wrapT = .Repeat
+            geometry.firstMaterial?.diffuse.minificationFilter = .Linear
+            geometry.firstMaterial?.diffuse.mipFilter = .Linear
+
+            geometry.firstMaterial?.emission.contents = colours[colRNG.nextInt()]
+
             geometry.firstMaterial?.doubleSided = true
             
             node.position = SCNVector3(CGFloat(xy.nextUniform()) * 100.0, -CGFloat(min.y) * 2.0, CGFloat(xy.nextUniform()) * 100.0)
