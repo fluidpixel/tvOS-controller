@@ -43,6 +43,11 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.button1.hidden = true
+        self.button2.hidden = true
+        self.button3.hidden = true
+        
+        
         self.remote.delegate = self
         accelView.delegate = self
         // Do any additional setup after loading the view, typically from a nib.
@@ -249,29 +254,30 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
         for _ in 0..<20 {
             
             var geometry:SCNGeometry
-            var physics:SCNPhysicsShape
+            var physics:SCNPhysicsBody
             
             switch obj.nextInt() {
             case 1:
                 let size = CGFloat(sz.nextUniform()) * 20.0 + 5.0
                 geometry = SCNBox(width: size, height: size, length: size, chamferRadius: size * 0.2)
-                physics = SCNPhysicsShape(geometry: geometry, options: nil)
+                physics = SCNPhysicsBody(type: .Dynamic, shape: SCNPhysicsShape(geometry: geometry, options: nil))
             case 2:
                 let sizeA = CGFloat(sz.nextUniform()) * 15.0
                 let sizeB = CGFloat(sz.nextUniform()) * 5.0
                 geometry = SCNTorus(ringRadius: sizeA + sizeB, pipeRadius: sizeB)
-                physics = SCNPhysicsShape(geometry: geometry, options: nil)
+                physics = SCNPhysicsBody(type: .Dynamic, shape: SCNPhysicsShape(geometry: geometry, options: nil))
             case 3:
                 let sizeA = CGFloat(sz.nextUniform()) * 5.0
                 let sizeB = CGFloat(sz.nextUniform()) * 5.0
                 geometry = SCNCone(topRadius: 0.0, bottomRadius: sizeA + 5.0, height: sizeA + sizeB + 5.0)
-                physics = SCNPhysicsShape(geometry: geometry, options: nil)
+                physics = SCNPhysicsBody(type: .Dynamic, shape: SCNPhysicsShape(geometry: geometry, options: [SCNPhysicsShapeTypeKey:SCNPhysicsShapeTypeConvexHull]))
+                //physics.angularDamping = 0.9
             case 4:
                 geometry = SCNCapsule(capRadius: CGFloat(sz.nextUniform()) * 15.0 + 5.0, height: CGFloat(sz.nextUniform()) * 15.0 + 5.0)
-                physics = SCNPhysicsShape(geometry: geometry, options: nil)
+                physics = SCNPhysicsBody(type: .Dynamic, shape: SCNPhysicsShape(geometry: geometry, options: nil))
             default:
                 geometry = SCNSphere(radius: 3.0)
-                physics = SCNPhysicsShape(geometry: geometry, options: nil)
+                physics = SCNPhysicsBody(type: .Dynamic, shape: SCNPhysicsShape(geometry: geometry, options: nil))
             }
             
             
@@ -293,7 +299,7 @@ class ViewController: UIViewController, TVCTVSessionDelegate, SCNSceneRendererDe
             geometry.firstMaterial?.doubleSided = true
             
             node.position = SCNVector3(CGFloat(xy.nextUniform()) * 100.0, -CGFloat(min.y) * 2.0, CGFloat(xy.nextUniform()) * 100.0)
-            node.physicsBody = SCNPhysicsBody(type: .Dynamic, shape: physics)
+            node.physicsBody = physics
             
             node.physicsBody?.mass = 20.0
             accelView.scene!.rootNode.addChildNode(node)
