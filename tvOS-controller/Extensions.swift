@@ -48,8 +48,8 @@ extension SCNVector3 {
             self.x * mat4.m13 + self.y * mat4.m23 + self.z * mat4.m33)
     }
     
-    func magnitudeSquared() -> Float {
-        return ((self.x * self.x) + (self.y * self.y) + (self.z + self.z))
+    var magnitudeSquared:Float {
+        return ((self.x * self.x) + (self.y * self.y) + (self.z * self.z))
     }
 }
 
